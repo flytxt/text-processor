@@ -31,7 +31,7 @@ public class Marker {
 	
 	public ArrayList<Marker> splitAndGetMarkers(byte[] data, byte[] token){
 		int lastIndex = index;
-		ArrayList<Marker> markers = new ArrayList<>();
+		ArrayList<Marker> markers = new ArrayList<Marker>();
 		for(int i = index; i <= length; i++){
 			int j = 0;
 			boolean match = false;

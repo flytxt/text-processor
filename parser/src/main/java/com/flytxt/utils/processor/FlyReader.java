@@ -50,6 +50,7 @@ public class FlyReader {
 	            	    	  }
 	            	      }while(readCnt != -1);
 	            	      lp.done();
+	            	      file.close();
 	            	      Files.delete(path);
 	            	      if(stopRequested){
 	            	    	  break;
