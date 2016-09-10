@@ -15,8 +15,8 @@ public class StorageParser extends ParserUtils {
 			String str = "private Store "+ name +"Store = new Store(" +getValue(tt[1]).replaceAll("'", "\"") +");";
 			memberVar.append(str).append(System.lineSeparator());
 		}
-		String str = tt[0].replace("]", "");
-		String vars = str.substring(1, str.length()-1);
+		String str = tt[0].replace("]", "").trim();
+		String vars = str.substring(1, str.length());
 		code.append( name +"Store.save( data, "+ appendMarkers(vars)+");").append(System.lineSeparator());
 	}
 	private String appendMarkers(String vars){
