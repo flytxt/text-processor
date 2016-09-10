@@ -17,7 +17,7 @@ public class FlyReader {
 	private String folder;
 	private LineProcessor lp;
 	private boolean stopRequested;
-	byte[]eol = "\n\r".getBytes();
+	byte[]eol = System.lineSeparator().getBytes();
 	
 	public FlyReader(String folder, LineProcessor lp) {
 		this.lp = lp;
