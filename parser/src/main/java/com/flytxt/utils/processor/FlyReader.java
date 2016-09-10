@@ -28,22 +28,21 @@ public class FlyReader {
 	public void start() {
 		System.out.println("Startring file reader @ "+ folder);
 		
-		byte[] data = new byte[1024];
+		byte[] data = new byte[6024];
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(folder))) {
             for (Path path : directoryStream) {
-            	RandomAccessFile file= new RandomAccessFile(path.toString(), "rw");
+            	RandomAccessFile file= new RandomAccessFile(path.toString(), "r");
             	  try(FileChannel channel = file.getChannel()){
 	            	  // Get an exclusive lock on the whole file
-	            	  FileLock lock=null;
+	            	  //FileLock lock=null;
 	            	  try {
-	            	      lock = processFile(data, path, file, channel);
+	            	      processFile(data, path, file, channel);
 	            	      if(stopRequested){
 	            	    	  break;
 	            	      }
 	            	   } catch (OverlappingFileLockException e) {
 	            		   e.printStackTrace();;
 	            	   } finally {
-	            	    lock.release();
 	            	   }
 	            	  }catch (Exception e) {
 	            		  e.printStackTrace();;
@@ -56,15 +55,12 @@ public class FlyReader {
 		System.out.println("--done--");
 	}
 
-	private FileLock processFile(byte[] data, Path path, RandomAccessFile file, FileChannel channel)
+	private void processFile(byte[] data, Path path, RandomAccessFile file, FileChannel channel)
 			throws IOException {
-		FileLock lock;
-		lock = channel.lock();
 		  readLines(file, data);
 		  lp.done();
 		  file.close();
 		  Files.delete(path);
-		return lock;
 	}
 	
 	private final void readLines(RandomAccessFile file, byte[]data) throws IOException {
@@ -72,11 +68,11 @@ public class FlyReader {
 		int i = 0;
 		int readCnt;
 		int j = 0;
+		long t1 = System.currentTimeMillis();
 	      do{
 	    	  readCnt = file.read();
 	    	  data[i] = (byte) readCnt;
 	    	  if(readCnt == 10){
-	    		  System.out.println("match");
 	    	  }
 	    	  if(j < eol.length && readCnt != -1 
 	    			  && (byte)readCnt==eol[j] ){
@@ -87,9 +83,13 @@ public class FlyReader {
 	    		  lp.process(data, i);
 	    		  i = 0;
 	    		  j=0;
+	    		  continue;
 	    	  }
 	    	  i++;
-	      }while(readCnt != -1);		
+	    	  MarkerFactory.reclaim();
+	      }while(readCnt != -1);
+	      long t2 = System.currentTimeMillis();
+	      System.out.println("total time taken: "+ (t2-t1)/1000);
 	}
 
 	public void stop(){

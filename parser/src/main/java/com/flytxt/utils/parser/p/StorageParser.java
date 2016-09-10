@@ -1,6 +1,5 @@
 package com.flytxt.utils.parser.p;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
