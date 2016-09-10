@@ -39,7 +39,9 @@ public class StorageParser extends ParserUtils {
 
 	 private String  getStoreName(String s){
 		 String []tt = s.split("'")[1].split("/");
-		 return tt[tt.length-1];
+		 String str = tt[tt.length-1];
+		 int index = str.indexOf('.');
+		 return index > -1? str.substring(0, index):str;
 		}
 	
 	public boolean check(String line) {

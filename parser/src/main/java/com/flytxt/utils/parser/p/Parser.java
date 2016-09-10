@@ -39,23 +39,23 @@ public  class Parser {
 		
 		System.out.println(createProcessClass());
 	}
-	private String createProcessClass() {
+	public String createProcessClass() {
 		return 
 				"package com.flytxt.utils.parser;\n"
 				+"import java.util.ArrayList;\n"
 				+ "import com.flytxt.utils.processor.Store;\n"
 				+ "import com.flytxt.utils.parser.Marker;\n"
 				+ "import java.io.IOException;\n"
-				+ "import com.flytxt.utils.parser.MarkerFactory;\n"
-		+ "public  class "+ processorName+"FlyLineProcessor implements com.flytxt.utils.processor.LineProcessor{\n"
+		+ "public  class "+ processorName+" implements com.flytxt.utils.processor.LineProcessor{\n"
 		+ sp.getMembers() +"\n"
+		+ lp.getMemberVar()
 		+ fp.getInput()
-		+ "public void done() throws IOException{" + sp.getDoneCode() +"}\n"
-		+ "public void process(byte[] data, int lineSize) throws IOException{\n"
-		+ "Marker line = MarkerFactory.create(0, lineSize);\n"
+		+ "public final void done() throws IOException{" + sp.getDoneCode() +"}\n"
+		+ "public final void process(byte[] data, int lineSize) throws IOException{\n"
 		+ lp.getCode() +"\n"
 		+ sp.getCode()+"\n"
-		+"}}";
+		+ "}"
+		+ "}";
 		
 	}
 }

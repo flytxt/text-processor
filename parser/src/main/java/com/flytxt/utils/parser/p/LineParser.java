@@ -2,10 +2,15 @@ package com.flytxt.utils.parser.p;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class LineParser extends ParserUtils {
-	private HashMap<String, String> map = new HashMap<String, String>();
-	
+	private HashMap<String, String> tokenMemVarMap = new HashMap<String, String>();
+	private HashMap<String, String> tokenFucVarMap = new HashMap<String, String>();
+
+	public LineParser(){
+		code.append("line.index = 0;\nline.index = lineSize;\n");
+	}
 	public  void process(String line){
 		StringBuilder lineCode = new StringBuilder();
 		String [] res = line.replace(" ","").split("=>");
@@ -23,13 +28,13 @@ public class LineParser extends ParserUtils {
 			}
 			if(tt[i].startsWith("split")){
 				if(i == tt.length-1){
-					lineCode.append("splitAndGetMarkers( data, new byte[]").
-					append(toHex(getDelim(tt[i]))).
+					lineCode.append("splitAndGetMarkers( data, ").
+					append(getFunVar(getDelim(tt[i]))).
 					append(");");
 					i++;
 				}else if(tt[i+1].startsWith("element")){
-					lineCode.append("splitAndGetMarker( data, new byte[]").
-					append(toHex(getDelim(tt[i]))).
+					lineCode.append("splitAndGetMarker( data, ").
+					append(getFunVar(getDelim(tt[i]))).
 					append(",").append(getValue(tt[i+1])).
 					append(");");
 					i++;
@@ -48,25 +53,43 @@ public class LineParser extends ParserUtils {
 		code.append(lineCode.toString());
 	}
 	
-	private String toHex(String s){
-		char[] tt = s.replaceAll("'", "").trim().toCharArray();
-		byte[] h = {0x1,0x2};
-		StringBuilder v = new StringBuilder("{");
-		for(char c: tt){
-			v.append(String.format("0x%02X", (int)c)).append(',');
+	private String getFunVar(String s){
+		String token = s.replaceAll("'", "").trim();
+		String str =tokenFucVarMap.get(token);
+		if(str == null){
+			char[] tt = token.toCharArray();
+			StringBuilder v = new StringBuilder("{");
+			StringBuilder varName = new StringBuilder("token");
+			for(char c: tt){
+				String fmtName= String.format("0x%02X", (int)c); 
+				v.append(fmtName).append(',');
+				varName.append(fmtName);
+			}
+			v.deleteCharAt(v.length()-1);
+			v.append("}");
+			tokenMemVarMap.put(token, "private final byte[] "+varName.toString()+" = new byte[]" + v.toString() +";");
+			tokenFucVarMap.put(token, varName.toString());
+			str = varName.toString();
 		}
-		v.deleteCharAt(v.length()-1);
-		v.append("}");
-		return v.toString();
+		return str;
 	}	
 	public boolean check(String str) {
 		// TODO Auto-generated method stub
 		return true;
 	}
 	public void done(){
-		System.out.println(code.toString());
 	}
+
 	public String getCode(){
 		return code.toString();
+	}
+	
+	public String getMemberVar(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("private final Marker line = new Marker();\n");
+		for (Iterator<String> iterator = tokenMemVarMap.values().iterator(); iterator.hasNext();) {
+			sb.append( iterator.next()).append("\n");
+		}
+		return sb.toString();
 	}
 }
