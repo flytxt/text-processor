@@ -9,7 +9,7 @@ public class LineParser extends ParserUtils {
 	private HashMap<String, String> tokenFucVarMap = new HashMap<String, String>();
 
 	public LineParser(){
-		code.append("line.index = 0;\nline.index = lineSize;\n");
+		code.append("line.index = 0;\nline.length = lineSize;\n");
 	}
 	public  void process(String line){
 		StringBuilder lineCode = new StringBuilder();

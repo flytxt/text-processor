@@ -82,10 +82,9 @@ public class FlyReader {
 	    			  && (byte)readCnt==eol[j] ){
 	    		match = true;
 	    		j++;
-	    		  continue;
 	    	  }
 	    	  if(eol.length== j && match){
-	    		  lp.process(data, readCnt);
+	    		  lp.process(data, i);
 	    		  i = 0;
 	    		  j=0;
 	    	  }
