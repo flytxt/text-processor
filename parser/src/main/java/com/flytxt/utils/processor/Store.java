@@ -12,41 +12,45 @@ import com.flytxt.utils.parser.Marker;
 public class Store {
 	private RandomAccessFile channel;
 	private final byte csv = (byte)',';
+	private final byte[] newLine = System.lineSeparator().getBytes();
 	private int status;
 	public Store(String file, String...headers){
-		int index = file.toString().lastIndexOf("/");
-		if(index ==-1){
-			status = -1;
-			System.out.println("some thing wrong expected a file and fileName");
-			return;
-		}
-		String fileName = file.toString();
-		String folder = fileName.substring(0, index);
-		Path root = Paths.get(folder);
-		 
-		try {
-			if(! Files.exists(root))
-				Files.createDirectories(root);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
-		}
-		System.out.println("file created @ "+file.toString());
-		try{
-			channel = new RandomAccessFile(file.toString(), "rw");
-			for(String aheader: headers){
-				channel.write(aheader.getBytes());
-				channel.write(csv);
+		Path fileName = Paths.get(file);
+		if( ! Files.exists(fileName)){
+			Path folder = fileName.getParent();
+			try {
+				Files.createDirectories(folder);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				status = -1;
+				return;
 			}
-			channel.writeChars("\n\r");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("file created @ "+file.toString());
+			try{
+				channel = new RandomAccessFile(file.toString(), "rw");
+				for(String aheader: headers){
+					channel.write(aheader.getBytes());
+					channel.write(csv);
+				}
+				channel.write(newLine);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		else{
+			try{
+				channel = new RandomAccessFile(file.toString(), "rw");
+				channel.seek(channel.length());
+			}catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		
+		
 	}
 	
 	public void save(byte[] data, Marker... markers) throws IOException{
@@ -57,7 +61,7 @@ public class Store {
 			channel.write(data, aMarker.index, aMarker.length);
 			channel.write(csv);
 		}
-		channel.writeChars("\n\r");
+		channel.write(newLine);
 	}
 	
 	public void done() throws IOException{
