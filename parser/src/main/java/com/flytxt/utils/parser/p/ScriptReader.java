@@ -17,6 +17,7 @@ public class ScriptReader {
 			br = new BufferedReader(new FileReader(file));
 			while ((sCurrentLine = br.readLine()) != null) {
 				if(sCurrentLine.trim().length()==0) continue;
+				if(sCurrentLine.startsWith("#")) continue;
 				lp.process(sCurrentLine.replace("\\s+",""));
 			}
 
