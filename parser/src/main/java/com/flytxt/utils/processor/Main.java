@@ -38,6 +38,7 @@ public class Main {
 		main.loadFromClasspath();
 		watcher  = FileSystems.getDefault().newWatchService();
 	}
+	
 	public LineProcessor compileNLoad(String scriptName) throws Exception{
 		ScriptReader reader = new ScriptReader();
 		Parser p = new Parser();

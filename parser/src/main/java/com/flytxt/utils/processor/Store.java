@@ -49,8 +49,6 @@ public class Store {
 				// TODO: handle exception
 			}
 		}
-		
-		
 	}
 	
 	public void save(byte[] data, Marker... markers) throws IOException{

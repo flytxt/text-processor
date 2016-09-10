@@ -34,29 +34,32 @@ public class FlyReader {
             	RandomAccessFile file= new RandomAccessFile(path.toString(), "rw");
             	  try(FileChannel channel = file.getChannel()){
 	            	  // Get an exclusive lock on the whole file
-	            	  FileLock lock = channel.lock();
+	            	  FileLock lock=null;
 	            	  try {
 	            	      lock = processFile(data, path, file, channel);
 	            	      if(stopRequested){
 	            	    	  break;
 	            	      }
 	            	   } catch (OverlappingFileLockException e) {
-	            	    // File is open by someone else
+	            		   e.printStackTrace();;
 	            	   } finally {
 	            	    lock.release();
 	            	   }
 	            	  }catch (Exception e) {
+	            		  e.printStackTrace();;
 	            		  
 	            	  }
             }
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
 		System.out.println("--done--");
 	}
 
 	private FileLock processFile(byte[] data, Path path, RandomAccessFile file, FileChannel channel)
 			throws IOException {
 		FileLock lock;
-		lock = channel.tryLock();
+		lock = channel.lock();
 		  readLines(file, data);
 		  lp.done();
 		  file.close();
@@ -68,18 +71,25 @@ public class FlyReader {
 		boolean match= false;
 		int i = 0;
 		int readCnt;
+		int j = 0;
 	      do{
 	    	  readCnt = file.read();
-	    	  if(i<eol.length
-	    			  && readCnt != -1 
-	    			  && (byte)readCnt==eol[i++] ){
+	    	  data[i] = (byte) readCnt;
+	    	  if(readCnt == 10){
+	    		  System.out.println("match");
+	    	  }
+	    	  if(j < eol.length && readCnt != -1 
+	    			  && (byte)readCnt==eol[j] ){
 	    		match = true;
+	    		j++;
 	    		  continue;
 	    	  }
-	    	  if(eol.length== i&& match){
+	    	  if(eol.length== j && match){
 	    		  lp.process(data, readCnt);
 	    		  i = 0;
+	    		  j=0;
 	    	  }
+	    	  i++;
 	      }while(readCnt != -1);		
 	}
 

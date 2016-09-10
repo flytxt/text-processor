@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.flytxt.utils.processor.FlyReader;
+import com.flytxt.utils.processor.LineProcessor;
+import com.flytxt.utils.processor.Main;
+
 public class FunctionalTest {
 
 	private static String[] process(String line){
@@ -24,17 +28,15 @@ public class FunctionalTest {
 	public static void main(String[] args) {
 		try {
 			File file = new File("/Users/arunsoman/Downloads/worldcupplayerinfo_20140701.csv");
-			FileReader fileReader = new FileReader(file);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			StringBuffer stringBuffer = new StringBuffer();
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				process(line);
-			}
-			fileReader.close();
-			System.out.println("Contents of file:");
-			System.out.println(stringBuffer.toString());
+			Main main = new Main();
+			LineProcessor lp  = main.compileNLoad("Script2.lp");
+			FlyReader reader = new FlyReader(lp.getFolder(), lp);
+			reader.start();
+			
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
