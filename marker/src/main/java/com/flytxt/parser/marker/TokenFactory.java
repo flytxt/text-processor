@@ -1,4 +1,4 @@
-package com.flytxt.utils.parser;
+package com.flytxt.parser.marker;
 
 public class TokenFactory {
 	public static byte[] create(String string){

@@ -1,4 +1,4 @@
-package com.flytxt.utils.parser.p;
+package com.flytxt.parser.compiler.parser;
 
 public class FolderParser extends ParserUtils {
 	private String inputFolder;

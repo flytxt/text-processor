@@ -1,4 +1,4 @@
-package com.flytxt.utils.parser.p;
+package com.flytxt.parser.compiler.parser;
 
 public class ParserUtils {
 	protected StringBuilder code = new StringBuilder();
