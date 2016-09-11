@@ -11,7 +11,7 @@ public class FunctionalTest {
 	public static void main(String[] args) {
 		try {
 			Main main = new Main();
-			LineProcessor lp  = main.compileNLoad("Script2.lp");
+			LineProcessor lp  = CompilerProxy.compileNLoad("Script2.lp");
 			FlyReader reader = new FlyReader(lp.getFolder(), lp);
 			reader.start();
 			

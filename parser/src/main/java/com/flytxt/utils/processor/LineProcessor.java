@@ -2,7 +2,7 @@ package com.flytxt.utils.processor;
 
 import java.io.IOException;
 
-import com.flytxt.utils.parser.MarkerFactory;
+import com.flytxt.parser.marker.MarkerFactory;
 
 public interface LineProcessor {
 	String getFolder();

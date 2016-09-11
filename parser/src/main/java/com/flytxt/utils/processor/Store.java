@@ -7,7 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.flytxt.utils.parser.Marker;
+import com.flytxt.parser.marker.Marker;
+
 
 public class Store {
 	private RandomAccessFile channel;

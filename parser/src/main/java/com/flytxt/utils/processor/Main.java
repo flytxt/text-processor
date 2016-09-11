@@ -26,9 +26,6 @@ import java.util.concurrent.Executors;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import com.flytxt.utils.parser.p.Parser;
-import com.flytxt.utils.parser.p.ScriptReader;
-
 public class Main {
 	private List<Worker> workers = new ArrayList<Worker>();
 	private ExecutorService executor;
@@ -40,30 +37,6 @@ public class Main {
 		watcher  = FileSystems.getDefault().newWatchService();
 	}
 	
-	public LineProcessor compileNLoad(String scriptName) throws Exception{
-		ScriptReader reader = new ScriptReader();
-		Parser p = new Parser();
-		reader.read(scriptName, p);
-
-		
-		Path root = Paths.get("scripts");
-		Files.createDirectories(root);
-		String file = scriptName.substring(0, scriptName.length()-3);
-		File sourceFile = new File(root.toString(), "com/flytxt/utils/parser/"+file+".java");
-		sourceFile.getParentFile().mkdirs();
-		System.out.println("loc: "+sourceFile.getAbsolutePath());
-		Files.write(sourceFile.toPath(), p.createProcessClass().getBytes(StandardCharsets.UTF_8));
-
-		// Compile source file.
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		compiler.run(null, null, null, sourceFile.getPath());
-
-		// Load and instantiate compiled class.
-		URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { root.toUri().toURL() });
-		Class<?> cls = Class.forName("com.flytxt.utils.parser."+file, true, classLoader); // Should print "hello".
-		return (LineProcessor)cls.newInstance();
-		
-	}
 	
 	public void loadFromClasspath() throws Exception{
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -93,7 +66,9 @@ public class Main {
 		executor = Executors.newFixedThreadPool(lineProcessors.size());
         for (int i = 0; i < lineProcessors.size(); i++) {
         	String lpStr = lineProcessors.get(i);
-        	LineProcessor lp = compileNLoad(lpStr);
+        	//TODO
+        	LineProcessor lp = null;
+        	//LineProcessor lp = compileNLoad(lpStr);
         	Path dir = Paths.get(lp.getFolder());
         	try{
         		dir.register(watcher, java.nio.file.StandardWatchEventKinds.ENTRY_CREATE);

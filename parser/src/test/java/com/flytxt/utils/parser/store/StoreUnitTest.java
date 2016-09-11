@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.flytxt.utils.parser.Marker;
-import com.flytxt.utils.parser.MarkerFactory;
-import com.flytxt.utils.parser.TokenFactory;
+import com.flytxt.parser.marker.Marker;
+import com.flytxt.parser.marker.MarkerFactory;
+import com.flytxt.parser.marker.TokenFactory;
 import com.flytxt.utils.processor.Store;
 
 public class StoreUnitTest {

@@ -11,7 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.flytxt.utils.parser.MarkerFactory;
+import com.flytxt.parser.marker.MarkerFactory;
+
 
 public class FlyReader {
 	private String folder;
