@@ -32,12 +32,11 @@ public class FlyReader {
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(folder))) {
 			MarkerFactory mf = new MarkerFactory();
             for (Path path : directoryStream) {
-            	RandomAccessFile file= new RandomAccessFile(path.toString(), "r");
+            	RandomAccessFile file= new RandomAccessFile(path.toString(), "rw");
             	  try(FileChannel channel = file.getChannel()){
-	            	  // Get an exclusive lock on the whole file
-	            	  //FileLock lock=null;
 	            	  try {
-	            	      processFile(data, path, file, channel, mf);
+	            		  lp.setInputFileName(path.getFileName().toString());
+	            		  processFile(data, path, file, channel, mf);
 	            	      if(stopRequested){
 	            	    	  break;
 	            	      }
@@ -58,6 +57,7 @@ public class FlyReader {
 
 	private void processFile(byte[] data, Path path, RandomAccessFile file, FileChannel channel, MarkerFactory mf)
 			throws IOException {
+		
 		  readLines(file, data, mf);
 		  lp.done();
 		  file.close();

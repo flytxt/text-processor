@@ -32,8 +32,9 @@ import com.flytxt.utils.parser.p.ScriptReader;
 public class Main {
 	private List<Worker> workers = new ArrayList<Worker>();
 	private ExecutorService executor;
-	public static WatchService watcher;
+	private static WatchService watcher ;
 	public static void main(String[] args) throws Exception {
+		watcher = FileSystems.getDefault().newWatchService();
 		Main main = new Main();
 		main.loadFromClasspath();
 		watcher  = FileSystems.getDefault().newWatchService();
@@ -93,10 +94,14 @@ public class Main {
         for (int i = 0; i < lineProcessors.size(); i++) {
         	String lpStr = lineProcessors.get(i);
         	LineProcessor lp = compileNLoad(lpStr);
-        	map.put(lp.getFolder(), lp);
-        	
         	Path dir = Paths.get(lp.getFolder());
-        	dir.register(watcher, java.nio.file.StandardWatchEventKinds.ENTRY_CREATE);
+        	try{
+        		dir.register(watcher, java.nio.file.StandardWatchEventKinds.ENTRY_CREATE);
+        	}catch(java.nio.file.NoSuchFileException e){
+        		//TODO log this
+        		continue;
+        	}
+        	map.put(lp.getFolder(), lp);
             Runnable worker = new Worker(lp);
             executor.execute(worker);
           }

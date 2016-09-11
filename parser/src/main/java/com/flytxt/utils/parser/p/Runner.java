@@ -4,6 +4,6 @@ public class Runner {
 	public static void main(String[] args){
 		
 		ScriptReader reader = new ScriptReader();
-		reader.read("script.txt", new Parser());
+		reader.read("Script2.lp", new Parser());
 	}
 }

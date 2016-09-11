@@ -14,6 +14,7 @@ public class Store {
 	private final byte csv = (byte)',';
 	private final byte[] newLine = System.lineSeparator().getBytes();
 	private int status;
+	
 	public Store(String file, String...headers){
 		Path fileName = Paths.get(file);
 		if( ! Files.exists(fileName)){

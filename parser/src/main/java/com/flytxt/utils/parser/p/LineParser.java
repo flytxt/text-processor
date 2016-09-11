@@ -87,6 +87,7 @@ public class LineParser extends ParserUtils {
 	public String getMemberVar(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("private final Marker line = new Marker();\n");
+		sb.append("private String currentFileName;\n");
 		for (Iterator<String> iterator = tokenMemVarMap.values().iterator(); iterator.hasNext();) {
 			sb.append( iterator.next()).append("\n");
 		}
