@@ -11,15 +11,16 @@ import com.flytxt.utils.parser.MarkerFactory;
 import com.flytxt.utils.parser.TokenFactory;
 
 public class MarkerSplitTest {
+	MarkerFactory mf = new MarkerFactory();
 	@Test
 	public void test1() {
 		String strb = "a,b,c,d"; 
 		byte[] b = strb.getBytes();
 		
 		String str = ",";
-		Marker line = MarkerFactory.create(0, b.length-1);
+		Marker line = mf.create(0, b.length-1);
 		byte[] token = TokenFactory.create(str);
-		ArrayList <Marker> ms = line.splitAndGetMarkers(b, token);
+		ArrayList <Marker> ms = line.splitAndGetMarkers(b, token,mf);
 		String splits[] = strb.split(str);
 		if(splits.length != ms.size()){
 			assertEquals(splits.length, ms.size());
@@ -38,9 +39,9 @@ public class MarkerSplitTest {
 		byte[] b = strb.getBytes();
 		
 		String str = ",";
-		Marker line = MarkerFactory.create(0, b.length-1);
+		Marker line = mf.create(0, b.length-1);
 		byte[] token = TokenFactory.create(str);
-		ArrayList <Marker> ms = line.splitAndGetMarkers(b, token);
+		ArrayList <Marker> ms = line.splitAndGetMarkers(b, token, mf);
 		String splits[] = strb.split(str);
 		if(splits.length != ms.size()){
 			assertEquals(splits.length, ms.size());
@@ -60,9 +61,9 @@ public class MarkerSplitTest {
 		byte[] b = strb.getBytes();
 		
 		String str = ",";
-		Marker line = MarkerFactory.create(0, b.length-1);
+		Marker line = mf.create(0, b.length-1);
 		byte[] token = TokenFactory.create(str);
-		ArrayList <Marker> ms = line.splitAndGetMarkers(b, token);
+		ArrayList <Marker> ms = line.splitAndGetMarkers(b, token,mf);
 		String splits[] = strb.split(str);
 		if(splits.length != ms.size()){
 			assertEquals(splits.length, ms.size());
@@ -82,9 +83,9 @@ public class MarkerSplitTest {
 		byte[] b = strb.getBytes();
 		
 		String str = ",,";
-		Marker line = MarkerFactory.create(0, b.length-1);
+		Marker line = mf.create(0, b.length-1);
 		byte[] token = TokenFactory.create(str);
-		ArrayList <Marker> ms = line.splitAndGetMarkers(b, token);
+		ArrayList <Marker> ms = line.splitAndGetMarkers(b, token,mf);
 		String splits[] = strb.split(str);
 		if(splits.length != ms.size()){
 			assertEquals(splits.length, ms.size());
@@ -98,6 +99,4 @@ public class MarkerSplitTest {
 			k++;
 		}
 	}
-
-
 }

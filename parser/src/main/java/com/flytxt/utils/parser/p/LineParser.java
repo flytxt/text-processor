@@ -30,13 +30,13 @@ public class LineParser extends ParserUtils {
 				if(i == tt.length-1){
 					lineCode.append("splitAndGetMarkers( data, ").
 					append(getFunVar(getDelim(tt[i]))).
-					append(");");
+					append(", mf);");
 					i++;
 				}else if(tt[i+1].startsWith("element")){
 					lineCode.append("splitAndGetMarker( data, ").
 					append(getFunVar(getDelim(tt[i]))).
 					append(",").append(getValue(tt[i+1])).
-					append(");");
+					append(", mf);");
 					i++;
 				}else{
 					throw new RuntimeException("could not parse line:"+line);

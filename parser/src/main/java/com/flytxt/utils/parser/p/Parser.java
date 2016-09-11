@@ -51,7 +51,7 @@ public  class Parser {
 		+ lp.getMemberVar()
 		+ fp.getInput()
 		+ "public final void done() throws IOException{" + sp.getDoneCode() +"}\n"
-		+ "public final void process(byte[] data, int lineSize) throws IOException{\n"
+		+ "public final void process(byte[] data, int lineSize, MarkerFactory mf) throws IOException{\n"
 		+ lp.getCode() +"\n"
 		+ sp.getCode()+"\n"
 		+ "}"

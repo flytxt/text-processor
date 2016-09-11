@@ -11,7 +11,7 @@ import com.flytxt.utils.parser.MarkerFactory;
 import com.flytxt.utils.parser.TokenFactory;
 
 public class MarkerSplitAndGetTest {
-
+	private MarkerFactory mf = new MarkerFactory();
 	@Test
 	public void test() {
 		String strb = "a,bb,c,d"; 
@@ -20,9 +20,9 @@ public class MarkerSplitAndGetTest {
 		int javaIndex = get -1;
 		
 		String str = ",";
-		Marker line = MarkerFactory.create(0, b.length-1);
+		Marker line = mf.create(0, b.length-1);
 		byte[] token = TokenFactory.create(str);
-		Marker ms = line.splitAndGetMarker(b, token,get);
+		Marker ms = line.splitAndGetMarker(b, token,get, mf);
 		String splits[] = strb.split(str);
 		//for user index starts @ 1
 		if(!splits[javaIndex].equals(ms.toString(b))){
@@ -39,9 +39,9 @@ public class MarkerSplitAndGetTest {
 		int javaIndex = get -1;
 		
 		
-		Marker line = MarkerFactory.create(0, b.length-1);
+		Marker line = mf.create(0, b.length-1);
 		byte[] token = TokenFactory.create(str);
-		Marker ms = line.splitAndGetMarker(b, token,get);
+		Marker ms = line.splitAndGetMarker(b, token,get,mf);
 		
 		//for user index starts @ 1
 		if(!splits[javaIndex].equals(ms.toString(b))){
@@ -58,9 +58,9 @@ public class MarkerSplitAndGetTest {
 		int javaIndex = get -1;
 		
 		
-		Marker line = MarkerFactory.create(0, b.length-1);
+		Marker line = mf.create(0, b.length-1);
 		byte[] token = TokenFactory.create(str);
-		Marker ms = line.splitAndGetMarker(b, token,get);
+		Marker ms = line.splitAndGetMarker(b, token,get, mf);
 		
 		//for user index starts @ 1
 		if(!splits[javaIndex].equals(ms.toString(b))){
@@ -77,9 +77,9 @@ public class MarkerSplitAndGetTest {
 		int javaIndex = get -1;
 		
 		
-		Marker line = MarkerFactory.create(0, b.length-1);
+		Marker line = mf.create(0, b.length-1);
 		byte[] token = TokenFactory.create(str);
-		Marker ms = line.splitAndGetMarker(b, token,get);
+		Marker ms = line.splitAndGetMarker(b, token,get,mf);
 		
 		//for user index starts @ 1
 		if(!splits[javaIndex].equals(ms.toString(b))){

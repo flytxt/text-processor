@@ -13,7 +13,7 @@ import com.flytxt.utils.parser.TokenFactory;
 import com.flytxt.utils.processor.Store;
 
 public class StoreUnitTest {
-
+	MarkerFactory mf = new MarkerFactory();
 	@Test
 	public void test() {
 		String aon = "aon";
@@ -21,8 +21,8 @@ public class StoreUnitTest {
 		Store store = new Store("/tmp/out/my.csv", aon, age);
 		String str = "10,twenty";
 		byte[] strB = str.getBytes();
-		Marker line = MarkerFactory.create(0,  strB.length-1);
-		List<Marker> ms = line.splitAndGetMarkers(strB, TokenFactory.create(","));
+		Marker line = mf.create(0,  strB.length-1);
+		List<Marker> ms = line.splitAndGetMarkers(strB, TokenFactory.create(","),mf);
 		Marker aonM = ms.get(0);
 		Marker ageM = ms.get(1);
 		try {

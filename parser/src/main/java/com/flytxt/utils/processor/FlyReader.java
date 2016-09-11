@@ -30,13 +30,14 @@ public class FlyReader {
 		
 		byte[] data = new byte[6024];
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(folder))) {
+			MarkerFactory mf = new MarkerFactory();
             for (Path path : directoryStream) {
             	RandomAccessFile file= new RandomAccessFile(path.toString(), "r");
             	  try(FileChannel channel = file.getChannel()){
 	            	  // Get an exclusive lock on the whole file
 	            	  //FileLock lock=null;
 	            	  try {
-	            	      processFile(data, path, file, channel);
+	            	      processFile(data, path, file, channel, mf);
 	            	      if(stopRequested){
 	            	    	  break;
 	            	      }
@@ -55,16 +56,17 @@ public class FlyReader {
 		System.out.println("--done--");
 	}
 
-	private void processFile(byte[] data, Path path, RandomAccessFile file, FileChannel channel)
+	private void processFile(byte[] data, Path path, RandomAccessFile file, FileChannel channel, MarkerFactory mf)
 			throws IOException {
-		  readLines(file, data);
+		  readLines(file, data, mf);
 		  lp.done();
 		  file.close();
 		  Files.delete(path);
 	}
 	
-	private final void readLines(RandomAccessFile file, byte[]data) throws IOException {
+	private final void readLines(RandomAccessFile file, byte[]data, MarkerFactory mf) throws IOException {
 		boolean match= false;
+		
 		int i = 0;
 		int readCnt;
 		int j = 0;
@@ -80,13 +82,13 @@ public class FlyReader {
 	    		j++;
 	    	  }
 	    	  if(eol.length== j && match){
-	    		  lp.process(data, i);
+	    		  lp.process(data, i, mf);
 	    		  i = 0;
 	    		  j=0;
 	    		  continue;
 	    	  }
 	    	  i++;
-	    	  MarkerFactory.reclaim();
+	    	  mf.reclaim();
 	      }while(readCnt != -1);
 	      long t2 = System.currentTimeMillis();
 	      System.out.println("total time taken: "+ (t2-t1)/1000);
