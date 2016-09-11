@@ -1,13 +1,8 @@
 package com.flytxt.parser.processor;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
@@ -18,71 +13,77 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.flytxt.utils.parser.p.Parser;
-import com.flytxt.utils.parser.p.ScriptReader;
-
+@Controller
+@EnableAutoConfiguration
+@SpringBootApplication
 public class Main {
-	private List<Worker> workers = new ArrayList<Worker>();
+	private String[] scripts;
+	private ProxyScripts proxy= new ProxyScripts();
+	private HashMap<String, Worker> map = new HashMap<String, Worker>();
+	private List<Worker> workers;
 	private ExecutorService executor;
 	private static WatchService watcher ;
-	public static void main(String[] args) throws Exception {
-		watcher = FileSystems.getDefault().newWatchService();
-		Main main = new Main();
-		main.loadFromClasspath();
-		watcher  = FileSystems.getDefault().newWatchService();
+
+	
+	@RequestMapping(method = RequestMethod.GET, path = "/scripts")
+	public @ResponseBody String getitem(@RequestParam("scripts") String scripts){
+		this.scripts = scripts.split(","); 
+		restartWorkers();
+		return "ok";
 	}
 	
-	public void loadFromClasspath() throws Exception{
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		Enumeration<URL> roots = classLoader.getResources("");
-		ArrayList<String> lineProcessors = new ArrayList<String>();
-		while(roots.hasMoreElements()){
-			URL url = (URL) roots.nextElement();
-			System.out.println("url:"+url);
-			File root = new File(url.getPath());
-			for (File file : root.listFiles()) {
-				if (file.isDirectory()) {
-				    // Loop through its listFiles() recursively.
-				} else {
-				    String name = file.getName();
-				    System.out.println("found :"+name);
-				    if(name.contains("lp"))
-				    	lineProcessors.add(name);
-				}
+	public static void main(String[] args) throws Exception {
+		Main main = new Main();
+		main.scripts = main.proxy.getScipts();
+		main.restartWorkers();
+		watcher = FileSystems.getDefault().newWatchService();
+		SpringApplication.run(Main.class, args);
+	}
+	
+	private void restartWorkers(){
+		for(Worker aWorker: workers){
+			aWorker.stop();
+		}
+		try {
+			if(! executor.isShutdown())
+				executor.awaitTermination(15, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		workers = new ArrayList<Worker>(scripts.length);
+		executor = Executors.newFixedThreadPool(scripts.length +1);
+		executor.execute(new FolderEventHandler(this));
+		for(String aScript: scripts){
+        	try{
+				LineProcessor lp =	(LineProcessor)proxy.getInstanceFor(aScript);
+        		Path dir = Paths.get(lp.getFolder());
+        		dir.register(watcher, java.nio.file.StandardWatchEventKinds.ENTRY_CREATE);
+				Worker worker = new Worker(lp);
+				executor.execute(worker);
+			} catch ( Exception e) {
+			// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
 			}
 		}
-		System.out.println("total processors: " +lineProcessors.size());
-		startProcessing(lineProcessors);
 	}
-	private HashMap<String, LineProcessor> map = new HashMap<String, LineProcessor>();
-	public static Set<String> wokerAvailablity = new HashSet<String>();
-	public void startProcessing(ArrayList<String> lineProcessors ) throws Exception{
-		executor = Executors.newFixedThreadPool(lineProcessors.size());
-        for (int i = 0; i < lineProcessors.size(); i++) {
-        	String lpStr = lineProcessors.get(i);
-        	LineProcessor lp = compileNLoad(lpStr);
-        	Path dir = Paths.get(lp.getFolder());
-        	try{
-        		dir.register(watcher, java.nio.file.StandardWatchEventKinds.ENTRY_CREATE);
-        	}catch(java.nio.file.NoSuchFileException e){
-        		//TODO log this
-        		continue;
-        	}
-        	map.put(lp.getFolder(), lp);
-            Runnable worker = new Worker(lp);
-            executor.execute(worker);
-          }
-        while (!executor.isTerminated()) {
-        }
-	}
+	
 	
 	public void init6(){
 		for(Worker aWorker: workers){
@@ -91,35 +92,39 @@ public class Main {
 		executor.shutdown();
 	}
 	
-	private void handleEvents(){
-		while (true) {
-		    WatchKey key;
-		    try {
-		        // wait for a key to be available
-		        key = watcher.take();
-		    } catch (InterruptedException ex) {
-		        return;
-		    }
+	private class FolderEventHandler implements Runnable{
+		private Main main;
+		public FolderEventHandler(Main main) {
+			this.main = main;
+		}
+		public void run(){
+			WatchKey key;
+			while (true) {
+				try {
+					key = watcher.take();
+				} catch (InterruptedException ex) {
+					return;
+				}
 		 
-		    for (WatchEvent<?> event : key.pollEvents()) {
-		        WatchEvent.Kind<?> kind = event.kind();
-		        @SuppressWarnings("unchecked")
-		        WatchEvent<Path> ev = (WatchEvent<Path>) event;
-		        Path fileName = ev.context();
-		        System.out.println(kind.name() + ": " + fileName);
-		 
-		        if (kind == java.nio.file.StandardWatchEventKinds.ENTRY_CREATE) {
-		        	String folder = fileName.getParent().toString();
-		        	if(! Main.wokerAvailablity.contains(folder)){
-		        		executor.execute((Runnable) map.get(folder));
-		        		Main.wokerAvailablity.add(folder);
-		        	}
-		        } 
-		    }
-		    boolean valid = key.reset();
-		    if (!valid) {
-		        break;
-		    }
+				for (WatchEvent<?> event : key.pollEvents()) {
+			        WatchEvent.Kind<?> kind = event.kind();
+			        @SuppressWarnings("unchecked")
+			        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+			        Path fileName = ev.context();
+			        System.out.println(kind.name() + ": " + fileName);
+			 
+			        if (kind == java.nio.file.StandardWatchEventKinds.ENTRY_CREATE) {
+			        	String folder = fileName.getParent().toString();
+			        	if(map.get(folder).getStatus() == Worker.Status.TERMINATED) {
+			        		executor.execute( map.get(folder));
+			        	}
+			        } 
+			    }
+				boolean valid = key.reset();
+			    if (!valid) {
+			        break;
+			    }
+			}
 		}
 	}
 }

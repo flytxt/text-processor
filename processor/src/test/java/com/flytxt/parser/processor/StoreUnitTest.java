@@ -1,16 +1,16 @@
 package com.flytxt.parser.processor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.junit.Test;
 
-import com.flytxt.utils.parser.Marker;
-import com.flytxt.utils.parser.MarkerFactory;
-import com.flytxt.utils.parser.TokenFactory;
-import com.flytxt.utils.processor.Store;
+import com.flytxt.parser.marker.Marker;
+import com.flytxt.parser.marker.MarkerFactory;
+import com.flytxt.parser.marker.TokenFactory;
+
 
 public class StoreUnitTest {
 	MarkerFactory mf = new MarkerFactory();

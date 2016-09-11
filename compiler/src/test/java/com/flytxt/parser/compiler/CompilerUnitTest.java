@@ -11,37 +11,12 @@ import java.nio.file.Paths;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.flytxt.parser.compiler.parser.Parser;
 
 
-@Controller
-@SpringBootApplication
-@EnableAutoConfiguration
-public class Compiler {
-	@RequestMapping(path= "/", method = RequestMethod.GET)
-	public @ResponseBody String getScripts(@RequestParam("host") String host){
-		return "Script.pl";
-	}
-	
-	@RequestMapping(path= "/getJar", method = RequestMethod.GET)
-	public @ResponseBody byte[] getJar(@RequestParam("host") String host){
-		//<mime-type>application/java-archive</mime-type>
-		return null;
-	}
-	public static void main(String args[]){
-		SpringApplication.run(Compiler.class, args);
-	}
-	public Object compileNLoad(String scriptName) throws Exception{
-		ScriptReaderUnitTest reader = new ScriptReaderUnitTest();
+public class CompilerUnitTest {
+	public E compileNLoad(String scriptName) throws Exception{
+		ScriptReader reader = new ScriptReader();
 		Parser p = new Parser();
 		reader.read(scriptName, p);
 
@@ -60,7 +35,7 @@ public class Compiler {
 		// Load and instantiate compiled class.
 		URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { root.toUri().toURL() });
 		Class<?> cls = Class.forName("com.flytxt.utils.parser."+file, true, classLoader); // Should print "hello".
-		return cls.newInstance();
+		return (E)cls.newInstance();
 		
 	}
 }

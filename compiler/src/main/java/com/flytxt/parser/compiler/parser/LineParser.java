@@ -1,6 +1,5 @@
 package com.flytxt.parser.compiler.parser;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 
