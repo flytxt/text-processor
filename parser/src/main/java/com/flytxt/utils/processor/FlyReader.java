@@ -82,13 +82,17 @@ public class FlyReader {
 	    		j++;
 	    	  }
 	    	  if(eol.length== j && match){
-	    		  lp.process(data, i, mf);
+	    		  try{
+	    			  lp.process(data, i, mf);
+	    		  }catch (IndexOutOfBoundsException e) {
+					System.out.println("could not process : "+ new String(data, 0, i)+ " \n cause:"+e.getMessage());
+	    		  }
 	    		  i = 0;
 	    		  j=0;
+	    		  mf.reclaim();
 	    		  continue;
 	    	  }
 	    	  i++;
-	    	  mf.reclaim();
 	      }while(readCnt != -1);
 	      long t2 = System.currentTimeMillis();
 	      System.out.println("total time taken: "+ (t2-t1)/1000);
