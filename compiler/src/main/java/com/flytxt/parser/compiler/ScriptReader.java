@@ -12,8 +12,7 @@ public class ScriptReader {
 	public void read(String location, Parser lp) {
 		BufferedReader br = null;
 		try {
-			ClassLoader classLoader = getClass().getClassLoader();
-			File file = new File(classLoader.getResource(location).getFile());
+			File file = new File(location);
 			lp.setName(file.getName().substring(0,file.getName().indexOf('.')));
 			String sCurrentLine;
 			br = new BufferedReader(new FileReader(file));
