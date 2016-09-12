@@ -10,7 +10,9 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -29,32 +31,48 @@ import org.springframework.stereotype.Component;
 @Component
 @ComponentScan
 public class Utils {
-	public boolean createFile(String loc, String content, String fileName){
-		Path folder = Paths.get(loc+"com/flytxt/utils/parser");
-			try {
-				if(! Files.exists(folder)){
-					Files.createDirectories(folder);
-				}
-				Path file = Paths.get(folder.toString()+"/"+fileName);
-				OpenOption[] options = { StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING};
-				Files.write(file, content.getBytes(), options);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return false;
-			}
-			return true;
+	public String createFile(String loc, String content, String fileName){
+		try {
+			Path folder = createDir(loc);
+			Path file = Paths.get(folder.toString()+"/"+fileName);
+			OpenOption[] options = { StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING};
+			Files.write(file, content.getBytes(), options);
+			return file.toString();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	private Path createDir(String loc) throws IOException{
+		Path folder = Paths.get(loc);
+		if(! Files.exists(folder)){
+			Files.createDirectories(folder);
+		}
+		return folder;
 	}
 	public String complie(String src, String dest){
+		System.out.println(src + "  :  "+dest);
+		System.out.println(System.getProperty("java.class.path"));
+		try {
+			createDir(dest);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
 		JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
 		StandardJavaFileManager sjfm = javaCompiler.getStandardFileManager(null, null, null); 
 		  DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-		String[] options = new String[] { "-d", dest };
+
+		  List<String> optionList = new ArrayList<String>();
+		// set compiler's classpath to be same as the runtime's
+		optionList.addAll(Arrays.asList("-classpath",".m2/repository/com/flytxt/parser/marker/0.0.1-SNAPSHOT/marker-0.0.1-SNAPSHOT.jar:"+System.getProperty("java.class.path")));
+		optionList.addAll(Arrays.asList("-d",dest));
 		File[] javaFiles = new File[] { new File(src) };
 
 		StringWriter bos = new StringWriter();
 		CompilationTask compilationTask = javaCompiler.getTask(bos, null, null,
-		        Arrays.asList(options),
+		        optionList,
 		        null,
 		        sjfm.getJavaFileObjects(javaFiles)
 		);

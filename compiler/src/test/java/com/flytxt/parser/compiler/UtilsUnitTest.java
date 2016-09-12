@@ -21,14 +21,16 @@ public class UtilsUnitTest {
 			fail("sshould have produced  error text");
 		}
 	}
+	
 	@Test
 	public void testGoodClass(){
 		Utils utils = new Utils();
-		String src = "/Users/arunsoman/git/text-processor/compiler/src/test/resources/compiler/Good.java";
+		String src = "/tmp/java/demo/com/flytxt/utils/parser/script2.java";
 		String dest = "/tmp/classes";
 		String res =utils.complie(src, dest);
 		if(res != null){
-			fail("should have produced  error text");
+			System.out.println(res);
+			fail("should not have produced  error text");
 		}
 	}
 	
