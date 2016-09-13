@@ -23,10 +23,13 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
+
+import com.flytxt.parser.compiler.parser.Parser;
 
 @Component
 @ComponentScan
@@ -52,8 +55,6 @@ public class Utils {
 		return folder;
 	}
 	public String complie(String src, String dest){
-		System.out.println(src + "  :  "+dest);
-		System.out.println(System.getProperty("java.class.path"));
 		try {
 			createDir(dest);
 		} catch (IOException e) {
@@ -66,7 +67,7 @@ public class Utils {
 
 		  List<String> optionList = new ArrayList<String>();
 		// set compiler's classpath to be same as the runtime's
-		optionList.addAll(Arrays.asList("-classpath",".m2/repository/com/flytxt/parser/marker/0.0.1-SNAPSHOT/marker-0.0.1-SNAPSHOT.jar:"+System.getProperty("java.class.path")));
+		optionList.addAll(Arrays.asList("-classpath",System.getProperty("java.class.path")));
 		optionList.addAll(Arrays.asList("-d",dest));
 		File[] javaFiles = new File[] { new File(src) };
 
@@ -97,7 +98,14 @@ public class Utils {
 		return null;
 	}
 	
+	public String createJavaContent(String script){
+		Parser p = new Parser();
+		new ScriptReader().read(script, p);
+		String javaContent = p.createProcessClass();
+		return javaContent;
+	}
 	public void createJar(String loc, String dest) throws IOException{
+	System.out.println("JAr---"+loc+" : "+dest); 
 		Path destP = Paths.get(dest);
 		if(!Files.exists(destP.getParent())){
 			Files.createDirectories(destP);
@@ -105,6 +113,8 @@ public class Utils {
 		FileOutputStream fout = new FileOutputStream(dest);
 		JarOutputStream jarOut = new JarOutputStream(fout);
 		listFiles(Paths.get(loc), jarOut, loc.length()+1, true);
+		jarOut.close();
+		fout.close();
 	}
 	public void listFiles(Path path, JarOutputStream jarOut, int root, boolean isParent) throws IOException {
 	    try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
@@ -117,10 +127,12 @@ public class Utils {
 	            }
 	            String folderName = entry.getParent().toString().substring(root);
 	            if(isDirectory){
-	            	//System.out.println("zip ; "+folderName);
+	            	System.out.println("zip ; "+folderName+"/");
 	            	jarOut.putNextEntry(new ZipEntry(folderName+"/"));
 	            }else{
+	            	System.out.println("zip ; "+entry.toString().substring(root));
 	            	jarOut.putNextEntry(new ZipEntry(entry.toString().substring(root)));
+	            	System.out.println("read ; "+entry.toString());
 	            	jarOut.write(Files.readAllBytes(entry));
 	            	jarOut.closeEntry();
 	            	//System.out.println("\t"+entry.toString().substring(root));

@@ -29,17 +29,16 @@ public  class Parser {
 		fp.done();
 		lp.done();
 		sp.done();
-		
-		System.out.println(createProcessClass());
+		//System.out.println(createProcessClass());
 	}
 	public String createProcessClass() {
 		return 
 				"package com.flytxt.utils.parser;\n"
 				+"import java.util.ArrayList;\n"
-				+ "import com.flytxt.utils.processor.Store;\n"
-				+ "import com.flytxt.utils.parser.Marker;\n"
+				+ "import com.flytxt.parser.store.*;\n"
+				+ "import com.flytxt.parser.marker.*;\n"
 				+ "import java.io.IOException;\n"
-		+ "public  class "+ processorName+" implements com.flytxt.utils.processor.LineProcessor{\n"
+		+ "public  class "+ processorName+" implements LineProcessor{\n"
 		+ sp.getMembers() +"\n"
 		+ lp.getMemberVar()
 		+ fp.getInput()

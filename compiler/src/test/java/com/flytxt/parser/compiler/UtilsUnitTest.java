@@ -11,6 +11,14 @@ import org.junit.Test;
 
 public class UtilsUnitTest {
 	@Test
+	public void testCompileGivenScript(){
+		Utils utils = new Utils();
+		String scr = "/tmp/scripts/demo/script2.pl";
+		String java = utils.createJavaContent(scr);
+		String createFile = utils.createFile("/tmp/java/demo/", java, "script2.java");
+		utils.complie(createFile, "/tmp/java/demo");
+	}
+	@Test
 	public void testBadClass(){
 		Utils utils = new Utils();
 		String src = "/Users/arunsoman/git/text-processor/compiler/src/test/resources/compiler/Bad.java";

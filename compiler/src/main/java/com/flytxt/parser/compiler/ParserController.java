@@ -43,18 +43,14 @@ public class ParserController {
 			@RequestParam("scriptName") String scriptName
 			){
 
-		String srcFolder = javaHame+host+"/com/flytxt/utils/parser";
 		String scriptLoc= scriptHame+host;
 		utils.createFile(scriptLoc, script, scriptName);
-		Parser p = new Parser();
-		
-		new ScriptReader().read(scriptLoc+"/"+scriptName, p);
-		
-		String javaContent = p.createProcessClass();
+		String javaContent = utils.createJavaContent(scriptLoc+"/"+scriptName);
+		String srcFolder = javaHame+host+"/com/flytxt/utils/parser";
 		String javaFile = utils.createFile(srcFolder, javaContent, scriptName.replaceAll(".pl", ".java"));
 		utils.complie(javaFile, classHame+host+"/");
 		try {
-			utils.createJar(classHame, jarHome+host+"/"+host+".jar");
+			utils.createJar(classHame+host, jarHome+host+"/"+host+".jar");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return e.getMessage();
