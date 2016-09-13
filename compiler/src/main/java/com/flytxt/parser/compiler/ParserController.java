@@ -17,16 +17,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.flytxt.parser.compiler.parser.Parser;
-
 @Controller
 @EnableAutoConfiguration
 public class ParserController {
 
-	private String jarHome = "/tmp/jar/";
-	private String scriptHame = "/tmp/scripts/";
-	private String javaHame = "/tmp/java/";
-	private String classHame = "/tmp/class/";
+	@Autowired
+	private LocationSettings loc;
 	
 	@Autowired
 	private Utils utils;
@@ -43,14 +39,14 @@ public class ParserController {
 			@RequestParam("scriptName") String scriptName
 			){
 
-		String scriptLoc= scriptHame+host;
+		String scriptLoc= loc.scriptHame+host;
 		utils.createFile(scriptLoc, script, scriptName);
 		String javaContent = utils.createJavaContent(scriptLoc+"/"+scriptName);
-		String srcFolder = javaHame+host+"/com/flytxt/utils/parser";
+		String srcFolder = loc.javaHame+host+"/com/flytxt/utils/parser";
 		String javaFile = utils.createFile(srcFolder, javaContent, scriptName.replaceAll(".pl", ".java"));
-		utils.complie(javaFile, classHame+host+"/");
+		utils.complie(javaFile, loc.classHame+host+"/");
 		try {
-			utils.createJar(classHame+host, jarHome+host+"/"+host+".jar");
+			utils.createJar(loc.classHame+host, loc.jarHome+host+"/"+host+".jar");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return e.getMessage();
@@ -65,7 +61,7 @@ public class ParserController {
 			produces ={"application/java-archive"})
 	public @ResponseBody ResponseEntity<InputStreamResource> getJar(@RequestParam("host") String host){
 
-		File jar = new File(jarHome+host+"/"+host+".jar");
+		File jar = new File(loc.jarHome+host+"/"+host+".jar");
 		HttpHeaders headers = new HttpHeaders();
 	    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 	    headers.add("Pragma", "no-cache");

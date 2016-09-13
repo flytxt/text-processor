@@ -1,4 +1,4 @@
-package com.flytxt.parser.processor;
+package com.flytxt.parser.store;
 
 import static org.junit.Assert.fail;
 

@@ -1,13 +1,7 @@
 package com.flytxt.utils.processor;
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
@@ -19,17 +13,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Main {
 	private List<Worker> workers = new ArrayList<Worker>();
 	private ExecutorService executor;
 	private static WatchService watcher ;
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	public static void main(String[] args) throws Exception {
 		watcher = FileSystems.getDefault().newWatchService();
 		Main main = new Main();
@@ -44,20 +39,20 @@ public class Main {
 		ArrayList<String> lineProcessors = new ArrayList<String>();
 		while(roots.hasMoreElements()){
 			URL url = (URL) roots.nextElement();
-			System.out.println("url:"+url);
+			logger.debug("url:"+url);
 			File root = new File(url.getPath());
 			for (File file : root.listFiles()) {
 				if (file.isDirectory()) {
 				    // Loop through its listFiles() recursively.
 				} else {
 				    String name = file.getName();
-				    System.out.println("found :"+name);
+				    logger.debug("found :"+name);
 				    if(name.contains("lp"))
 				    	lineProcessors.add(name);
 				}
 			}
 		}
-		System.out.println("total processors: " +lineProcessors.size());
+		logger.debug("total processors: " +lineProcessors.size());
 		startProcessing(lineProcessors);
 	}
 	private HashMap<String, LineProcessor> map = new HashMap<String, LineProcessor>();
@@ -106,7 +101,7 @@ public class Main {
 		        @SuppressWarnings("unchecked")
 		        WatchEvent<Path> ev = (WatchEvent<Path>) event;
 		        Path fileName = ev.context();
-		        System.out.println(kind.name() + ": " + fileName);
+		        logger.debug(kind.name() + ": " + fileName);
 		 
 		        if (kind == java.nio.file.StandardWatchEventKinds.ENTRY_CREATE) {
 		        	String folder = fileName.getParent().toString();

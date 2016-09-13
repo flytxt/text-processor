@@ -3,10 +3,15 @@ package com.flytxt.parser.compiler.parser;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StorageParser extends ParserUtils {
 	
 	private Set<String> stores = new HashSet<String>();
 	private StringBuilder memberVar = new StringBuilder();
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	public  void process(String line){
 		String[] tt = line.split("->");
 		String name = getStoreName(tt[1]);
@@ -51,8 +56,8 @@ public class StorageParser extends ParserUtils {
 		}
 	}
 	public void done(){
-		System.out.println(code.toString());
-		System.out.println(memberVar.toString());
+		logger.debug(code.toString());
+		logger.debug(memberVar.toString());
 	}
 	public String getMembers(){
 		return memberVar.toString();

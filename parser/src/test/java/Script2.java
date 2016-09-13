@@ -1,8 +1,9 @@
-import java.util.ArrayList;
-import com.flytxt.parser.marker.*;
-import com.flytxt.parser.marker.process.Store;
-
 import java.io.IOException;
+import java.util.ArrayList;
+
+import com.flytxt.parser.marker.LineProcessor;
+import com.flytxt.parser.marker.Marker;
+import com.flytxt.parser.marker.MarkerFactory;
 public  class Script2 implements LineProcessor{
 //ivate Store wcStore = new Store("/tmp/out/wc.csv");
 

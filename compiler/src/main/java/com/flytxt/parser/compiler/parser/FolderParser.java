@@ -1,8 +1,12 @@
 package com.flytxt.parser.compiler.parser;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FolderParser extends ParserUtils {
 	private String inputFolder;
 	private String doneAction;
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public boolean check(String line) {
 		try{
@@ -14,7 +18,7 @@ public class FolderParser extends ParserUtils {
 			return false;
 		}
 		}catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("error @: "+line);
+			logger.debug("error @: "+line);
 			throw new RuntimeException(line);
 		}
 	}
@@ -29,7 +33,7 @@ public class FolderParser extends ParserUtils {
 		}
 	}
 	public void done(){
-		System.out.println(code.toString());
+		logger.debug(code.toString());
 	}
 
 }

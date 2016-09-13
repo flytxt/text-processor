@@ -1,12 +1,15 @@
 package com.flytxt.parser.marker;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MarkerSplitTest {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	MarkerFactory mf = new MarkerFactory();
 	@Test
 	public void test1() {
@@ -42,7 +45,7 @@ public class MarkerSplitTest {
 		if(splits.length != ms.size()){
 			assertEquals(splits.length, ms.size());
 		}
-		System.out.println("length:"+ms.size());
+		logger.debug("length:"+ms.size());
 		int k = 0;
 		for(Marker m: ms){
 			if(!splits[k].equals(m.toString(b))){
@@ -64,7 +67,7 @@ public class MarkerSplitTest {
 		if(splits.length != ms.size()){
 			assertEquals(splits.length, ms.size());
 		}
-		System.out.println("length:"+ms.size());
+		logger.debug("length:"+ms.size());
 		int k = 0;
 		for(Marker m: ms){
 			if(!splits[k].equals(m.toString(b))){
@@ -86,7 +89,7 @@ public class MarkerSplitTest {
 		if(splits.length != ms.size()){
 			assertEquals(splits.length, ms.size());
 		}
-		System.out.println("length:"+ms.size());
+		logger.debug("length:"+ms.size());
 		int k = 0;
 		for(Marker m: ms){
 			if(!splits[k].equals(m.toString(b))){

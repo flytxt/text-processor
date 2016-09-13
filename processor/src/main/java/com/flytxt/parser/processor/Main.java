@@ -1,7 +1,4 @@
 package com.flytxt.parser.processor;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,16 +6,14 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,6 +33,7 @@ public class Main {
 	private List<Worker> workers;
 	private ExecutorService executor;
 	private static WatchService watcher ;
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	
 	@RequestMapping(method = RequestMethod.GET, path = "/scripts")
@@ -111,7 +107,7 @@ public class Main {
 			        @SuppressWarnings("unchecked")
 			        WatchEvent<Path> ev = (WatchEvent<Path>) event;
 			        Path fileName = ev.context();
-			        System.out.println(kind.name() + ": " + fileName);
+			        logger.debug(kind.name() + ": " + fileName);
 			 
 			        if (kind == java.nio.file.StandardWatchEventKinds.ENTRY_CREATE) {
 			        	String folder = fileName.getParent().toString();

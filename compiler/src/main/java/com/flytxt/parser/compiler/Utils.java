@@ -23,9 +23,10 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,7 @@ import com.flytxt.parser.compiler.parser.Parser;
 @Component
 @ComponentScan
 public class Utils {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public String createFile(String loc, String content, String fileName){
 		try {
 			Path folder = createDir(loc);
@@ -105,7 +107,7 @@ public class Utils {
 		return javaContent;
 	}
 	public void createJar(String loc, String dest) throws IOException{
-	System.out.println("JAr---"+loc+" : "+dest); 
+	logger.debug("JAr---"+loc+" : "+dest); 
 		Path destP = Paths.get(dest);
 		if(!Files.exists(destP.getParent())){
 			Files.createDirectories(destP);
@@ -127,15 +129,15 @@ public class Utils {
 	            }
 	            String folderName = entry.getParent().toString().substring(root);
 	            if(isDirectory){
-	            	System.out.println("zip ; "+folderName+"/");
+	            	logger.debug("zip ; "+folderName+"/");
 	            	jarOut.putNextEntry(new ZipEntry(folderName+"/"));
 	            }else{
-	            	System.out.println("zip ; "+entry.toString().substring(root));
+	            	logger.debug("zip ; "+entry.toString().substring(root));
 	            	jarOut.putNextEntry(new ZipEntry(entry.toString().substring(root)));
-	            	System.out.println("read ; "+entry.toString());
+	            	logger.debug("read ; "+entry.toString());
 	            	jarOut.write(Files.readAllBytes(entry));
 	            	jarOut.closeEntry();
-	            	//System.out.println("\t"+entry.toString().substring(root));
+	            	//logger.debug("\t"+entry.toString().substring(root));
 	            }
 	        }
 	    }

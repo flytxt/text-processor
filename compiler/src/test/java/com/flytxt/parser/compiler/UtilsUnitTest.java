@@ -8,8 +8,11 @@ import java.nio.file.Paths;
 import java.util.jar.JarOutputStream;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UtilsUnitTest {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Test
 	public void testCompileGivenScript(){
 		Utils utils = new Utils();
@@ -24,7 +27,7 @@ public class UtilsUnitTest {
 		String src = "/Users/arunsoman/git/text-processor/compiler/src/test/resources/compiler/Bad.java";
 		String dest = "/tmp/";
 		String res = utils.complie(src, dest);
-		System.out.println(res);
+		logger.debug(res);
 		if(res == null){
 			fail("sshould have produced  error text");
 		}
@@ -33,11 +36,11 @@ public class UtilsUnitTest {
 	@Test
 	public void testGoodClass(){
 		Utils utils = new Utils();
-		String src = "/tmp/java/demo/com/flytxt/utils/parser/script2.java";
+		String src = "/tmp/java/demo/com/flytxt/utils/parser/Script2.java";
 		String dest = "/tmp/classes";
 		String res =utils.complie(src, dest);
 		if(res != null){
-			System.out.println(res);
+			logger.debug(res);
 			fail("should not have produced  error text");
 		}
 	}

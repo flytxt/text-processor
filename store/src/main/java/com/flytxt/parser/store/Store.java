@@ -7,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.flytxt.parser.marker.Marker;
 
 
@@ -15,6 +18,7 @@ public class Store {
 	private final byte csv = (byte)',';
 	private final byte[] newLine = System.lineSeparator().getBytes();
 	private int status;
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public Store(String file, String...headers){
 		Path fileName = Paths.get(file);
@@ -27,7 +31,7 @@ public class Store {
 				status = -1;
 				return;
 			}
-			System.out.println("file created @ "+file.toString());
+			logger.debug("file created @ "+file.toString());
 			try{
 				channel = new RandomAccessFile(file.toString(), "rw");
 				for(String aheader: headers){
