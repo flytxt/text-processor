@@ -1,10 +1,7 @@
 package com.flytxt.parser.processor;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
@@ -17,57 +14,44 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
+import net.contentobjects.jnotify.JNotify;
+import net.contentobjects.jnotify.JNotifyListener;
 
-@Component
 @Data
-public class FolderEventListener implements Runnable{
+public class FolderEventListener implements  JNotifyListener{
 
-	private WatchService watcher ;
 	private boolean requestShutDown;
 	private Logger logger = LoggerFactory.getLogger(FolderEventListener.class);
 	
-	@Autowired
 	private Processor processor;
 
-	public FolderEventListener() throws IOException{
-		watcher = FileSystems.getDefault().newWatchService();
-
-	}
-	
 	public void attachListener(String folder) throws IOException{
-		Path dir = Paths.get(folder);
-		dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
+	    int watchID = JNotify.addWatch(folder, JNotify.FILE_CREATED , false, this);
+		logger.debug("Listener added for"+folder);
 	}
-	public void run(){
-		logger.debug("starting folder listener");
-			WatchKey key;
-			while (!requestShutDown) {
-				try {
-					key = watcher.take();
-				} catch (InterruptedException ex) {
-					return;
-				}
-		 
-				for (WatchEvent<?> event : key.pollEvents()) {
-			        WatchEvent.Kind<?> kind = event.kind();
-			        @SuppressWarnings("unchecked")
-			        WatchEvent<Path> ev = (WatchEvent<Path>) event;
-			        Path fileName = ev.context();
-			        if (kind == java.nio.file.StandardWatchEventKinds.ENTRY_CREATE) {
-			        	String folder = fileName.getParent().toString();
-			        	processor.handleEvent(folder);
-			        } 
-			    }
-				boolean valid = key.reset();
-			    if (!valid) {
-			        break;
-			    }
-			}
-		}
 
 	@PreDestroy
 	public void stop() throws IOException {
 		requestShutDown = true;
-		watcher.close();
+		logger.debug("shutting down FolderEventListener");
 	}
+
+	@Override
+	public void fileCreated(int arg0, String arg1, String arg2) {
+		logger.debug("Folder"+arg1 +" fileName "+arg2);
+		processor.handleEvent(arg1,arg2);
 	}
+
+	@Override
+	public void fileDeleted(int arg0, String arg1, String arg2) {
+	}
+
+	@Override
+	public void fileModified(int arg0, String arg1, String arg2) {
+	}
+
+	@Override
+	public void fileRenamed(int arg0, String arg1, String arg2, String arg3) {
+	}
+
+}

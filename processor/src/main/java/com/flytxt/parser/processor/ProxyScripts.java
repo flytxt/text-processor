@@ -22,10 +22,12 @@ public class ProxyScripts {
 	public String hostName;
 	
 	public LineProcessor[] getLPInstance() throws Exception{
-//		URL url = new URL(remoteHost+getJar+"?host="+hostName); 
-		URL url = new URL("file:///tmp/jar/demo/demo.jar"); 
+		String[] scriptNames =getScipts();
+		URL url = new URL(remoteHost+getJar+"?host="+hostName); 
+//		URL url = new URL("file:///tmp/jar/demo/demo.jar"); 
 		try(URLClassLoader loader = new URLClassLoader(new URL[] { url })){
 			LineProcessor[] lpA = new LineProcessor[1];
+			//TODO load classes from scriptName, now its hard coded
 			@SuppressWarnings("unchecked")
 			Class<LineProcessor> loadClass = (Class<LineProcessor>) loader.loadClass("com.flytxt.utils.parser.Script2");
 			lpA[0] = loadClass.newInstance();
