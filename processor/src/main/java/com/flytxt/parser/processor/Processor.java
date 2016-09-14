@@ -22,6 +22,9 @@ public class Processor {
 	private ProxyScripts proxy;
 	@Autowired
 	FolderEventListener folderEventListener;
+	@Autowired
+	private ApplicationContext ctx;
+	
 	private List<FlyReader> fileReaders = new ArrayList<FlyReader>();
 	private ThreadPoolExecutor executor;
 	
@@ -43,7 +46,7 @@ public class Processor {
 			executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(lpInstance.length);
 			String folder; 
 			for(LineProcessor lP: lpInstance){
-				FlyReader reader = (FlyReader)Main.ctx.getBean("flyReader");
+				FlyReader reader = (FlyReader)ctx.getBean("flyReader");
 				folder = lP.getFolder();
 				reader.set(folder, lP);
 				fileReaders.add(reader);

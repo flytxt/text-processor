@@ -1,22 +1,13 @@
 package com.flytxt.parser.processor;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-import com.flytxt.parser.instrumentation.InstrumentationAgent;
 import com.flytxt.parser.marker.LineProcessor;
 
 import lombok.Data;
@@ -30,11 +21,18 @@ public class ProxyScripts {
 	public String remoteHost;
 	public String hostName;
 	
-	public LineProcessor[] getLPInstance() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
+	public LineProcessor[] getLPInstance() throws Exception{
 //		URL url = new URL(remoteHost+getJar+"?host="+hostName); 
 		URL url = new URL("file:///tmp/jar/demo/demo.jar"); 
-		URLClassLoader loader = new URLClassLoader(new URL[] { url });
-        return null;
+		try(URLClassLoader loader = new URLClassLoader(new URL[] { url })){
+			LineProcessor[] lpA = new LineProcessor[1];
+			@SuppressWarnings("unchecked")
+			Class<LineProcessor> loadClass = (Class<LineProcessor>) loader.loadClass("com.flytxt.utils.parser.Script2");
+			lpA[0] = loadClass.newInstance();
+			return lpA;
+		}catch (Exception e) {
+			throw e;
+		}
 	}
 	
 	public String[] getScipts(){
