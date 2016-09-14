@@ -10,5 +10,7 @@ public interface LineProcessor {
 	void process(byte[] data, int readCnt, MarkerFactory mf) throws IOException;
 
 	void done() throws IOException;
+
+	String getFilter();
 	
 }

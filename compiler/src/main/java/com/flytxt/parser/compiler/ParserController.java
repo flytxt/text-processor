@@ -57,14 +57,15 @@ public class ParserController {
 	
 	@RequestMapping(
 			path= "/getJar", 
-			method = RequestMethod.GET,
-			produces ={"application/java-archive"})
+			method = RequestMethod.GET
+			)
 	public @ResponseBody ResponseEntity<InputStreamResource> getJar(@RequestParam("host") String host){
 
 		File jar = new File(loc.jarHome+host+"/"+host+".jar");
 		HttpHeaders headers = new HttpHeaders();
 	    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 	    headers.add("Pragma", "no-cache");
+	    headers.add("Accept", "application/java-archive");
 	    headers.add("Expires", "0");
         headers.add("Content-Disposition", "attachment; filename="+host+".jar");
 	    

@@ -8,29 +8,39 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import com.flytxt.parser.marker.LineProcessor;
 import com.flytxt.parser.marker.MarkerFactory;
 
+import lombok.Getter;
 
-public class FlyReader {
+@Component
+@Scope("prototype")
+public class FlyReader implements Callable<FlyReader> {
 	private String folder;
 	private LineProcessor lp;
 	private boolean stopRequested;
+	public enum Status {RUNNING, TERMINATED, SHUTTINGDOWN}
+	@Getter
+	private Status status;
 	byte[]eol = System.lineSeparator().getBytes();
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	public FlyReader(String folder, LineProcessor lp) {
+	public void set(String folder, LineProcessor lp) {
 		this.lp = lp;
 		this.folder = folder;
 		logger.debug("file reader @ "+ folder);
 	}
-
-	public void start() {
+	
+	public void run() {
 		logger.debug("Startring file reader @ "+ folder);
-		
 		byte[] data = new byte[6024];
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(folder))) {
 			MarkerFactory mf = new MarkerFactory();
@@ -41,6 +51,7 @@ public class FlyReader {
 	            		  lp.setInputFileName(path.getFileName().toString());
 	            		  processFile(data, path, file, channel, mf);
 	            	      if(stopRequested){
+	            	    	  logger.debug("shutting down Wroker id:");
 	            	    	  break;
 	            	      }
 	            	   } catch (OverlappingFileLockException e) {
@@ -69,7 +80,6 @@ public class FlyReader {
 	
 	private final void readLines(RandomAccessFile file, byte[]data, MarkerFactory mf) throws IOException {
 		boolean match= false;
-		
 		int i = 0;
 		int readCnt;
 		int j = 0;
@@ -103,5 +113,23 @@ public class FlyReader {
 
 	public void stop(){
 		stopRequested = true;
+	}
+
+	@Override
+	public FlyReader call() throws Exception {
+		run();
+		return this;
+	}
+
+	public boolean canProcess(String fileName) {
+		if(lp.getFolder().equals(Paths.get(fileName).getParent().toString())){
+			String regex = lp.getFilter();
+			if(regex == null)
+				return true;
+			Pattern pattern = Pattern.compile(regex);
+			return pattern.matcher(fileName).find();
+		}else{
+			return false;
+		}
 	}
 }

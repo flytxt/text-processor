@@ -42,6 +42,7 @@ public  class Parser {
 		+ sp.getMembers() +"\n"
 		+ lp.getMemberVar()
 		+ fp.getInput()
+		+ fp.getFileFilter()
 		+ "public final void done() throws IOException{" + sp.getDoneCode() +"}\n"
 		+ "public final void setInputFileName(String currentFileName){ this.currentFileName = currentFileName;}\n"
 		+ "public final void process(byte[] data, int lineSize, MarkerFactory mf) throws IOException{\n"
