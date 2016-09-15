@@ -23,64 +23,53 @@ public class ParserController {
 
 	@Autowired
 	private LocationSettings loc;
-	
+
 	@Autowired
 	private Utils utils;
-	
-	@RequestMapping(path= "/", method = RequestMethod.GET)
-	public @ResponseBody String getScripts(@RequestParam("host") String host){
+
+	@RequestMapping(path = "/", method = RequestMethod.GET)
+	public @ResponseBody String getScripts(@RequestParam("host") String host) {
 		return "Script.pl";
 	}
 
-	@RequestMapping(path= "/submit", method = RequestMethod.GET)
-	public @ResponseBody String submitScript(
-			@RequestParam("host") String host,
-			@RequestParam("script") String script,
-			@RequestParam("scriptName") String scriptName
-			){
+	@RequestMapping(path = "/submit", method = RequestMethod.GET)
+	public @ResponseBody String submitScript(@RequestParam("host") String host, @RequestParam("script") String script,
+			@RequestParam("scriptName") String scriptName) {
 
-		String scriptLoc= loc.scriptHame+host;
-		utils.createFile(scriptLoc, script, scriptName);
-		String javaContent = utils.createJavaContent(scriptLoc+"/"+scriptName);
-		String srcFolder = loc.javaHame+host+"/com/flytxt/utils/parser";
-		String javaFile = utils.createFile(srcFolder, javaContent, scriptName.replaceAll(".pl", ".java"));
-		utils.complie(javaFile, loc.classHame+host+"/");
 		try {
-			utils.createJar(loc.classHame+host, loc.jarHome+host+"/"+host+".jar");
-		} catch (IOException e) {
+			utils.createFile(loc.getScriptDumpLoc(host), script, scriptName);
+			String javaContent = utils.createJavaContent(loc.getScriptURI(host, scriptName));
+			String javaFile = utils.createFile(loc.getJavaDumpLoc(host), javaContent,
+					scriptName.replaceAll(".pl", ".java"));
+			utils.complie(javaFile, loc.getClassDumpLoc(host));
+			utils.createJar(loc.getClassDumpLoc(host), loc.getJarDumpLocatiom(host) + host + ".jar");
+		} catch (Exception e) {
 			e.printStackTrace();
 			return e.getMessage();
 		}
 		return "OK";
 	}
-	
-	
-	@RequestMapping(
-			path= "/getJar", 
-			method = RequestMethod.GET
-			)
-	public @ResponseBody ResponseEntity<InputStreamResource> getJar(@RequestParam("host") String host){
 
-		File jar = new File(loc.jarHome+host+"/"+host+".jar");
+	@RequestMapping(path = "/getJar", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<InputStreamResource> getJar(@RequestParam("host") String host) {
+
+		File jar = new File(loc.jarHome + host + "/" + host + ".jar");
 		HttpHeaders headers = new HttpHeaders();
-	    headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-	    headers.add("Pragma", "no-cache");
-	    headers.add("Accept", "application/java-archive");
-	    headers.add("Expires", "0");
-        headers.add("Content-Disposition", "attachment; filename="+host+".jar");
-	    
-	    try {
-			return ResponseEntity
-			        .ok()
-			        .headers(headers)
-			        .contentLength(jar.length())
-			        .contentType(MediaType.parseMediaType("application/octet-stream"))
-			        .body(new InputStreamResource(new FileInputStream(jar)));
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Accept", "application/java-archive");
+		headers.add("Expires", "0");
+		headers.add("Content-Disposition", "attachment; filename=" + host + ".jar");
+
+		try {
+			return ResponseEntity.ok().headers(headers).contentLength(jar.length())
+					.contentType(MediaType.parseMediaType("application/octet-stream"))
+					.body(new InputStreamResource(new FileInputStream(jar)));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    return null;
+		return null;
 
 	}
 

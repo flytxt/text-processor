@@ -36,18 +36,13 @@ import com.flytxt.parser.compiler.parser.Parser;
 @ComponentScan
 public class Utils {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	public String createFile(String loc, String content, String fileName){
-		try {
+	public String createFile(String loc, String content, String fileName) throws IOException{
+	logger.debug("createFile(loc="+ loc +"fileName="+fileName+")");
 			Path folder = createDir(loc);
 			Path file = Paths.get(folder.toString()+"/"+fileName);
 			OpenOption[] options = { StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING};
 			Files.write(file, content.getBytes(), options);
 			return file.toString();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
 	}
 	private Path createDir(String loc) throws IOException{
 		Path folder = Paths.get(loc);
@@ -56,12 +51,12 @@ public class Utils {
 		}
 		return folder;
 	}
-	public String complie(String src, String dest){
+	public String complie(String src, String dest) throws Exception{
+		logger.debug("compile(src="+ src +" Dest="+dest+")");
 		try {
 			createDir(dest);
 		} catch (IOException e) {
-			e.printStackTrace();
-			return e.getMessage();
+			throw new Exception(e);
 		}
 		JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
 		StandardJavaFileManager sjfm = javaCompiler.getStandardFileManager(null, null, null); 
@@ -95,7 +90,7 @@ public class Utils {
 		        msg.append(": ");
 		        msg.append(err.getMessage(myLocale));
 		      }
-		      return msg.toString() + "\n" + bos.toString();
+		      throw new Exception( msg.toString() + "\n" + bos.toString());
 		    }
 		return null;
 	}
@@ -108,8 +103,8 @@ public class Utils {
 	}
 	public void createJar(String loc, String dest) throws IOException{
 	logger.debug("JAr---"+loc+" : "+dest); 
-		Path destP = Paths.get(dest);
-		if(!Files.exists(destP.getParent())){
+		Path destP = Paths.get(dest).getParent();
+		if(!Files.exists(destP)){
 			Files.createDirectories(destP);
 		}
 		FileOutputStream fout = new FileOutputStream(dest);
@@ -137,7 +132,6 @@ public class Utils {
 	            	logger.debug("read ; "+entry.toString());
 	            	jarOut.write(Files.readAllBytes(entry));
 	            	jarOut.closeEntry();
-	            	//logger.debug("\t"+entry.toString().substring(root));
 	            }
 	        }
 	    }
