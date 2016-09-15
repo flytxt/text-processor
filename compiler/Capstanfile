@@ -1,0 +1,17 @@
+
+base: cloudius/osv-openjdk
+
+#
+# The command line passed to OSv to start up the application.
+#
+cmdline: /java.so -jar /app.jar
+
+#
+# The command to use to download the application.
+#
+
+#
+# List of files that are included in the generated image.
+#
+files:
+  /app.jar: /Users/arunsoman/git/text-processor/compiler/target/compiler-0.0.1-SNAPSHOT.jar
