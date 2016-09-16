@@ -13,6 +13,7 @@ public class MarkerFactory {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public Marker create(int lastIndex, int i) {
+		System.out.println("index:" + lastIndex+" len:" +1);
 		Marker m = null;
 		try{
 			m= home.pop();
