@@ -1,7 +1,13 @@
 package com.flytxt.parser.processor;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.jar.JarInputStream;
+import java.util.zip.ZipEntry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -20,25 +26,31 @@ public class ProxyScripts {
 	public String remoteHost;
 	public String hostName;
 	
-	public LineProcessor[] getLPInstance() throws Exception{
-//		String[] scriptNames =getScipts();
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	public List<LineProcessor> getLPInstance() throws Exception{
 //		URL url = new URL(remoteHost+getJar+"?host="+hostName); 
 		URL url = new URL("file:///tmp/jar/demo/demo.jar"); 
-		try(URLClassLoader loader = new URLClassLoader(new URL[] { url })){
-			LineProcessor[] lpA = new LineProcessor[1];
-			//TODO load classes from scriptName, now its hard coded
-			@SuppressWarnings("unchecked")
-			Class<LineProcessor> loadClass = (Class<LineProcessor>) loader.loadClass("com.flytxt.utils.parser.Script");
-			lpA[0] = loadClass.newInstance();
-			return lpA;
+		try(JarInputStream jIs = new JarInputStream(url.openStream())){
+			ZipEntry zipEntry;
+			String aClass;
+			List<LineProcessor> lps = new ArrayList<LineProcessor>();
+				try(URLClassLoader loader = new URLClassLoader(new URL[] { url })){
+					while((zipEntry = jIs.getNextEntry()) != null){
+						if(!zipEntry.isDirectory()){
+							aClass = zipEntry.getName().replaceAll("/", ".");
+							aClass = aClass.substring(0, aClass.length()-".class".length());
+							logger.debug("loading class:"+aClass);
+							@SuppressWarnings("unchecked")
+							Class<LineProcessor> loadClass = (Class<LineProcessor>) loader.loadClass(aClass);
+							lps.add(loadClass.newInstance());
+						}
+					}
+					return lps;
+				}
 		}catch (Exception e) {
+			logger.error("can't load classes ",e);
 			throw e;
 		}
-	}
-	
-	public String[] getScipts(){
-	    RestTemplate restTemplate = new RestTemplate();
-	    String result = restTemplate.getForObject(remoteHost+getScript+"?host="+hostName, String.class);
-	    return result.split(",");
 	}
 }

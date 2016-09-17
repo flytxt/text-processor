@@ -1,6 +1,8 @@
 package com.flytxt.parser.processor;
 
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -22,6 +24,8 @@ public class Processor {
 	@Autowired
 	private ApplicationContext ctx;
 	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	private List<FlyReader> fileReaders = new ArrayList<FlyReader>();
 	private ThreadPoolExecutor executor;
 	
@@ -32,10 +36,10 @@ public class Processor {
 	}
 	
 	@PostConstruct
-	public void startFileReaders(){
+	public void startFileReaders() throws Exception{
 		try {
-			LineProcessor[] lpInstance = proxy.getLPInstance();
-			executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(lpInstance.length);
+			List<LineProcessor> lpInstance = proxy.getLPInstance();
+			executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(lpInstance.size());
 			String folder; 
 			for(LineProcessor lP: lpInstance){
 				FlyReader reader = (FlyReader)ctx.getBean("flyReader");
@@ -46,8 +50,8 @@ public class Processor {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-		//	((AbstractApplicationContext) ctx).close();
+			logger.error("can't start readers",e);
+			throw e;
 		}
 	}
 

@@ -59,7 +59,7 @@ public class FlyReader implements Callable<FlyReader> {
 				logger.info("could not create input folder, stoppin this FlyReader ",e1);
 				stopRequested = true;
 			}
-        logger.debug("Startring file reader @ " + folder);
+        logger.debug("Starting file reader @ " + folder);
         final byte[] data = new byte[6024];
         final MarkerFactory mf = new MarkerFactory();
         while (!stopRequested) {
@@ -67,30 +67,27 @@ public class FlyReader implements Callable<FlyReader> {
                 for (final Path path : directoryStream) {
                     final RandomAccessFile file = new RandomAccessFile(path.toString(), "rw");
                     logger.debug("picked up " + path.toString());
-                    try (FileChannel channel = file.getChannel()) {
-                        try {
+                     try {
                             lp.setInputFileName(path.getFileName().toString());
-                            processFile(data, path, file, channel, mf);
+                            processFile(data, path, file, mf);
                             if (stopRequested) {
-                                logger.debug("shutting down Wroker id:");
+                                logger.debug("shutting down Wroker @ :"+folder);
                                 break;
                             }
                         } catch (final OverlappingFileLockException e) {
-                            e.printStackTrace();
+                            logger.error("Couldnot process "+path.toString(),e);
                         } finally {
+                        	file.close();
                         }
-                    } catch (final Exception e) {
-                        e.printStackTrace();
-                    }
                 }
             } catch (final Exception ex) {
                 ex.printStackTrace();
             }
         }
-        logger.debug("FlyReader--done--");
+        logger.debug("Worker down " + folder);
     }
 
-    private void processFile(final byte[] data, final Path path, final RandomAccessFile file, final FileChannel channel, final MarkerFactory mf) throws IOException {
+    private void processFile(final byte[] data, final Path path, final RandomAccessFile file, final MarkerFactory mf) throws IOException {
 
         readLines(file, data, mf);
         lp.done();
