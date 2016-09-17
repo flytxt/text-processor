@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringBufferInputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -66,10 +67,10 @@ public class ParserController {
 					.contentType(MediaType.parseMediaType("application/octet-stream"))
 					.body(new InputStreamResource(new FileInputStream(jar)));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return ResponseEntity.ok().headers(headers)
+					.contentType(MediaType.parseMediaType("application/octet-stream"))
+					.body(new InputStreamResource(new StringBufferInputStream("no content for"+host)));
 		}
-		return null;
 
 	}
 

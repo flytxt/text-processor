@@ -109,7 +109,7 @@ public class Utils {
 		}
 		FileOutputStream fout = new FileOutputStream(dest);
 		JarOutputStream jarOut = new JarOutputStream(fout);
-		listFiles(Paths.get(loc), jarOut, loc.length()+1, true);
+		listFiles(Paths.get(loc), jarOut, loc.length(), true);
 		jarOut.close();
 		fout.close();
 	}
