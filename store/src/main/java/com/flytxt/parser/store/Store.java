@@ -42,7 +42,7 @@ public class Store {
 				return;
 			}
 		}
-		String[] tmp = fileName.split(".");
+		String[] tmp = fileName.split("\\.");
 		String name = tmp[0] + System.currentTimeMillis() + "." + tmp[1];
 		fileNameP = Paths.get(name);
 		try {
