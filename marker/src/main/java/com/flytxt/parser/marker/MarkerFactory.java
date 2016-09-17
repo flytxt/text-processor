@@ -1,60 +1,73 @@
 package com.flytxt.parser.marker;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MarkerFactory {
-	private ArrayDeque<Marker> home = new ArrayDeque<Marker>();
-	private ArrayDeque<Marker> roam = new ArrayDeque<Marker>();
-	private ArrayDeque<ArrayList<Marker>> homeList = new ArrayDeque<ArrayList<Marker>>();
-	private ArrayDeque<ArrayList<Marker>> roamList = new ArrayDeque<ArrayList<Marker>>();
-	private int reused;
-	private int created;
-	private int createdPerLine;
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	public Marker create(int lastIndex, int i) {
-		System.out.println("index:" + lastIndex+" len:" +1);
-		Marker m = null;
-		try{
-			m= home.pop();
-			m.index=lastIndex;
-			m.length = i;
-			reused ++;
-			roam.push(m);
-		}catch (Exception e) {
-			m = new Marker();
-			m.index=lastIndex;
-			m.length = i;
-			created++;
-			createdPerLine++;
-			roam.push(m);
-		}
-		return m;
-	}
-	public void reclaim(){
-		ArrayDeque<Marker> tmp =home;
-		home = roam;
-		roam = tmp;
-		ArrayDeque<ArrayList<Marker>> tmpList =homeList;
-		homeList = roamList;
-		roamList = tmpList;
-		createdPerLine = 0;
-	}
-	
-	public void printStat(){
-		logger.debug("Reused cnt:" + reused + "created :"+ created);
-		logger.debug("created/line :"+ createdPerLine);
-	}
-	public ArrayList<Marker> getArrayList() {
-		ArrayList<Marker> list;
-		list = homeList.pop();
-		if(list == null)
-			list = new ArrayList<Marker>();
-		roamList.push(list);
-		return list;
-	}
+
+    private ArrayDeque<Marker> home = new ArrayDeque<Marker>();
+
+    private ArrayDeque<Marker> roam = new ArrayDeque<Marker>();
+
+    private ArrayDeque<FlyList<Marker>> homeList = new ArrayDeque<FlyList<Marker>>();
+
+    private ArrayDeque<FlyList<Marker>> roamList = new ArrayDeque<FlyList<Marker>>();
+
+    private int reused;
+
+    private int created;
+
+    private int reusedList;
+
+    private int createdList;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    public Marker create(final int lastIndex, final int i) {
+        Marker m = null;
+        try {
+            m = home.pop();
+            m.index = lastIndex;
+            m.length = i;
+            reused++;
+        } catch (final Exception e) {
+            m = new Marker();
+            m.index = lastIndex;
+            m.length = i;
+            created++;
+        }
+        roam.push(m);
+        return m;
+    }
+
+    public void reclaim() {
+        final ArrayDeque<Marker> tmp = home;
+        home = roam;
+        roam = tmp;
+
+        final ArrayDeque<FlyList<Marker>> tmpList = homeList;
+        homeList = roamList;
+        roamList = tmpList;
+    }
+
+    public void printStat() {
+        logger.debug("Markers reused: " + reused + " created: " + created);
+        logger.debug("List reused: " + reusedList + " created:" + createdList);
+    }
+
+    public FlyList<Marker> getArrayList() {
+        FlyList<Marker> list;
+        try {
+            list = homeList.pop();
+            list.clear();
+            reusedList++;
+        } catch (final Exception e) {
+            list = new FlyList<Marker>();
+            createdList++;
+        }
+        roamList.push(list);
+        return list;
+    }
 }

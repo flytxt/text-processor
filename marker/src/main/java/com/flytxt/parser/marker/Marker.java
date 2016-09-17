@@ -1,6 +1,5 @@
 package com.flytxt.parser.marker;
 
-import java.util.ArrayList;
 
 public class Marker {
 
@@ -33,15 +32,13 @@ public class Marker {
         return null;
     }
 
-    public ArrayList<Marker> splitAndGetMarkers(final byte[] data, final byte[] token, final MarkerFactory mf) {
+    public FlyList<Marker> splitAndGetMarkers(final byte[] data, final byte[] token, final MarkerFactory mf) {
 
-        final ArrayList<Marker> markers = mf.getArrayList();
+        final FlyList<Marker> markers = mf.getArrayList();
         int currentIndex = index, lastIndex = index, tokenIndex;
 
         while (currentIndex - index <= length) {
-            for (tokenIndex = 0; 
-            		tokenIndex < token.length && token[tokenIndex] == data[currentIndex + tokenIndex]; 
-            		tokenIndex++) { // loop to check if token is present at position i
+            for (tokenIndex = 0; tokenIndex < token.length && token[tokenIndex] == data[currentIndex + tokenIndex]; tokenIndex++) { // loop to check if token is present at position i
                 ;
             }
             if (tokenIndex == token.length) {

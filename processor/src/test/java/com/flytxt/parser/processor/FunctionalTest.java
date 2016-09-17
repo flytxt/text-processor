@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,62 +23,59 @@ import org.springframework.web.client.RestTemplate;
 
 public class FunctionalTest {
 
-	public void tt(){
-		try {
-			File f = new File(new URI("http://localhost:9000/getjar?host=demo"));
-			JarFile jf = new JarFile(f);
-			Enumeration<JarEntry> entries = jf.entries();
-			while(entries.hasMoreElements()){
-				System.out.println(entries.nextElement().getName());
-			}
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	@Test
-	public void ty(){
-		ByteArrayHttpMessageConverter byteArrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
+    public void tt() {
+        try {
+            final File f = new File(new URI("http://localhost:9000/getJar?host=demo"));
+            final JarFile jf = new JarFile(f);
+            final Enumeration<JarEntry> entries = jf.entries();
+            while (entries.hasMoreElements()) {
+                System.out.println(entries.nextElement().getName());
+            }
+        } catch (final URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (final IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-		List<MediaType> supportedApplicationTypes = new ArrayList<MediaType>();
-		MediaType pdfApplication = new MediaType("application","java-archive");
-		supportedApplicationTypes.add(pdfApplication);
+    public void ty() {
+        final ByteArrayHttpMessageConverter byteArrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
 
-		byteArrayHttpMessageConverter.setSupportedMediaTypes(supportedApplicationTypes);
-		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
-		messageConverters.add(byteArrayHttpMessageConverter);
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.setMessageConverters(messageConverters);
+        final List<MediaType> supportedApplicationTypes = new ArrayList<MediaType>();
+        final MediaType pdfApplication = new MediaType("application", "java-archive");
+        supportedApplicationTypes.add(pdfApplication);
 
-		Object result = restTemplate.getForObject("http://localhost:9000/getjar?host=demo", byte[].class, "1");
-		byte[] resultByteArr = (byte[])result;
+        byteArrayHttpMessageConverter.setSupportedMediaTypes(supportedApplicationTypes);
+        final List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+        messageConverters.add(byteArrayHttpMessageConverter);
+        final RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setMessageConverters(messageConverters);
 
-	}
-	public void tt1(){
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());    
-		HttpHeaders headers = new HttpHeaders();
-		headers.clear();
-		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-		headers.add("Accept-Encoding","gzip, deflate, sdch");
-		HttpEntity<String> entity = new HttpEntity<String>(headers);
+        final Object result = restTemplate.getForObject("http://localhost:9000/getJar?host=demo", byte[].class, "1");
+        final byte[] resultByteArr = (byte[]) result;
 
-		ResponseEntity<byte[]> response = restTemplate.exchange(
-				"http://localhost:9000/getjar?host=demo", HttpMethod.GET, entity, byte[].class, "1");
-		
+    }
 
-		if(response.getStatusCode().equals(HttpStatus.OK))
-		        {       
-		                try(FileOutputStream output = new FileOutputStream(new File("filename.jar"))){
-		                output.write(response.getBody());
-		                }catch (Exception e) {
-							// TODO: handle exception
-						}
-		        }
-	}
-	
+    public void tt1() {
+        final RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
+        final HttpHeaders headers = new HttpHeaders();
+        headers.clear();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add("Accept-Encoding", "gzip, deflate, sdch");
+        final HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        final ResponseEntity<byte[]> response = restTemplate.exchange("http://localhost:9000/getJar?host=demo", HttpMethod.GET, entity, byte[].class, "1");
+
+        if (response.getStatusCode().equals(HttpStatus.OK)) {
+            try (FileOutputStream output = new FileOutputStream(new File("filename.jar"))) {
+                output.write(response.getBody());
+            } catch (final Exception e) {
+                // TODO: handle exception
+            }
+        }
+    }
+
 }
