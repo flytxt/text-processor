@@ -34,7 +34,7 @@ public  class Parser {
 	public String createProcessClass() {
 		return 
 				"package com.flytxt.utils.parser;\n"
-				+"import java.util.ArrayList;\n"
+				+"import java.util.List;\n"
 				+ "import com.flytxt.parser.store.*;\n"
 				+ "import com.flytxt.parser.marker.*;\n"
 				+ "import java.io.IOException;\n"
