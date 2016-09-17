@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
+import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
@@ -178,7 +179,7 @@ public class FolderEventListener {
 					}
 
 					for (WatchEvent<?> event : take.pollEvents()) {
-						WatchEvent.Kind kind = event.kind();
+						Kind<?> kind = event.kind();
 						if (kind == OVERFLOW) {
 							continue;
 						}

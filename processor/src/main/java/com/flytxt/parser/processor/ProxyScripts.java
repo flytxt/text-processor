@@ -1,5 +1,4 @@
 package com.flytxt.parser.processor;
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -22,14 +21,14 @@ public class ProxyScripts {
 	public String hostName;
 	
 	public LineProcessor[] getLPInstance() throws Exception{
-		String[] scriptNames =getScipts();
-		URL url = new URL(remoteHost+getJar+"?host="+hostName); 
-//		URL url = new URL("file:///tmp/jar/demo/demo.jar"); 
+//		String[] scriptNames =getScipts();
+//		URL url = new URL(remoteHost+getJar+"?host="+hostName); 
+		URL url = new URL("file:///tmp/jar/demo/demo.jar"); 
 		try(URLClassLoader loader = new URLClassLoader(new URL[] { url })){
 			LineProcessor[] lpA = new LineProcessor[1];
 			//TODO load classes from scriptName, now its hard coded
 			@SuppressWarnings("unchecked")
-			Class<LineProcessor> loadClass = (Class<LineProcessor>) loader.loadClass("com.flytxt.utils.parser.Script2");
+			Class<LineProcessor> loadClass = (Class<LineProcessor>) loader.loadClass("com.flytxt.utils.parser.Script");
 			lpA[0] = loadClass.newInstance();
 			return lpA;
 		}catch (Exception e) {
