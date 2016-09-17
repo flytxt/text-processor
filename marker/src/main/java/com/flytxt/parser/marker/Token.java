@@ -1,6 +1,6 @@
 package com.flytxt.parser.marker;
 
-public class Token implements Delim {
+public class Token {
 	public final byte[] token;
 	private int[] ptrs;
 	private int indexPtr=0;
