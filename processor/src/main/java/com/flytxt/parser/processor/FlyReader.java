@@ -2,7 +2,6 @@ package com.flytxt.parser.processor;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -51,14 +50,15 @@ public class FlyReader implements Callable<FlyReader> {
     }
 
     public void run() {
-    	Path folderP =Paths.get(folder);
-    	if(!Files.exists(folderP))
-			try {
-				Files.createDirectories(folderP);
-			} catch (IOException e1) {
-				logger.info("could not create input folder, stoppin this FlyReader ",e1);
-				stopRequested = true;
-			}
+        final Path folderP = Paths.get(folder);
+        if (!Files.exists(folderP)) {
+            try {
+                Files.createDirectories(folderP);
+            } catch (final IOException e1) {
+                logger.info("could not create input folder, stoppin this FlyReader ", e1);
+                stopRequested = true;
+            }
+        }
         logger.debug("Starting file reader @ " + folder);
         final byte[] data = new byte[6024];
         final MarkerFactory mf = new MarkerFactory();
@@ -67,18 +67,18 @@ public class FlyReader implements Callable<FlyReader> {
                 for (final Path path : directoryStream) {
                     final RandomAccessFile file = new RandomAccessFile(path.toString(), "rw");
                     logger.debug("picked up " + path.toString());
-                     try {
-                            lp.setInputFileName(path.getFileName().toString());
-                            processFile(data, path, file, mf);
-                            if (stopRequested) {
-                                logger.debug("shutting down Wroker @ :"+folder);
-                                break;
-                            }
-                        } catch (final OverlappingFileLockException e) {
-                            logger.error("Couldnot process "+path.toString(),e);
-                        } finally {
-                        	file.close();
+                    try {
+                        lp.setInputFileName(path.getFileName().toString());
+                        processFile(data, path, file, mf);
+                        if (stopRequested) {
+                            logger.debug("shutting down Wroker @ :" + folder);
+                            break;
                         }
+                    } catch (final OverlappingFileLockException e) {
+                        logger.error("Couldnot process " + path.toString(), e);
+                    } finally {
+                        file.close();
+                    }
                 }
             } catch (final Exception ex) {
                 ex.printStackTrace();
@@ -104,9 +104,15 @@ public class FlyReader implements Callable<FlyReader> {
         do {
             readCnt = file.read();
             data[i] = (byte) readCnt;
-            if (readCnt == 10) {
-            }
+
             if (j < eol.length && readCnt != -1 && (byte) readCnt == eol[j]) {
+
+                if (i == eol.length) {
+                    i = 0;
+                    mf.reclaim();
+                    continue;
+                }
+
                 match = true;
                 j++;
             }

@@ -29,15 +29,13 @@ public class MarkerFactory {
         Marker m = null;
         try {
             m = home.pop();
-            m.index = lastIndex;
-            m.length = i;
             reused++;
         } catch (final Exception e) {
             m = new Marker();
-            m.index = lastIndex;
-            m.length = i;
             created++;
         }
+        m.index = lastIndex;
+        m.length = i;
         roam.push(m);
         return m;
     }

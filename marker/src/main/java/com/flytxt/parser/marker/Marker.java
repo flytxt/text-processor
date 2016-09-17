@@ -1,6 +1,5 @@
 package com.flytxt.parser.marker;
 
-
 public class Marker {
 
     public int index;
