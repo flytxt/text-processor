@@ -13,6 +13,7 @@ public class MarkerFactory {
 	private ArrayDeque<ArrayList<Marker>> roamList = new ArrayDeque<ArrayList<Marker>>();
 	private int reused;
 	private int created;
+	private int createdPerLine;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public Marker create(int lastIndex, int i) {
@@ -29,6 +30,7 @@ public class MarkerFactory {
 			m.index=lastIndex;
 			m.length = i;
 			created++;
+			createdPerLine++;
 			roam.push(m);
 		}
 		return m;
@@ -40,10 +42,12 @@ public class MarkerFactory {
 		ArrayDeque<ArrayList<Marker>> tmpList =homeList;
 		homeList = roamList;
 		roamList = tmpList;
+		createdPerLine = 0;
 	}
 	
 	public void printStat(){
 		logger.debug("Reused cnt:" + reused + "created :"+ created);
+		logger.debug("created/line :"+ createdPerLine);
 	}
 	public ArrayList<Marker> getArrayList() {
 		ArrayList<Marker> list;
