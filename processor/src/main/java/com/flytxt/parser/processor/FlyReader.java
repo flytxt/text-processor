@@ -51,6 +51,14 @@ public class FlyReader implements Callable<FlyReader> {
     }
 
     public void run() {
+    	Path folderP =Paths.get(folder);
+    	if(!Files.exists(folderP))
+			try {
+				Files.createDirectories(folderP);
+			} catch (IOException e1) {
+				logger.info("could not create input folder, stoppin this FlyReader ",e1);
+				stopRequested = true;
+			}
         logger.debug("Startring file reader @ " + folder);
         final byte[] data = new byte[6024];
         final MarkerFactory mf = new MarkerFactory();
