@@ -12,9 +12,9 @@ public class FlyList<T> implements List<T> {
     private int size;
 
     @SuppressWarnings("unchecked")
-    public FlyList() {
+    public FlyList(int size) {
         size = 0;
-        array = (T[]) new Object[1500];
+        array = (T[]) new Object[size];
     }
 
     public boolean add(final T element) {

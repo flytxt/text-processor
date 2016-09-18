@@ -25,6 +25,8 @@ public class MarkerFactory {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	private int listSize;
+
     public Marker create(final int lastIndex, final int i) {
         Marker m = null;
         try {
@@ -62,10 +64,15 @@ public class MarkerFactory {
             list.clear();
             reusedList++;
         } catch (final Exception e) {
-            list = new FlyList<Marker>();
+            list = new FlyList<Marker>(listSize);
             createdList++;
         }
         roamList.push(list);
         return list;
     }
+
+	public void setMaxListSize(int maxListSize) {
+		listSize = maxListSize;
+		
+	}
 }

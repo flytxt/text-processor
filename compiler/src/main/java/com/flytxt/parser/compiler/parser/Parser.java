@@ -43,6 +43,7 @@ public  class Parser {
 		+ lp.getMemberVar()
 		+ fp.getInput()
 		+ fp.getFileFilter()
+		+ "public final  int getMaxListSize(){ return "+ lp.getMaxVallue() +";}\n"
 		+ "public final void done() throws IOException{" + sp.getDoneCode() +"}\n"
 		+ "public final void setInputFileName(String currentFileName){ this.currentFileName = currentFileName;}\n"
 		+ "public final void process(byte[] data, int lineSize, MarkerFactory mf) throws IOException{\n"

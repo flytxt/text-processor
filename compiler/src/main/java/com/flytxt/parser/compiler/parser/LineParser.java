@@ -91,4 +91,8 @@ public class LineParser extends ParserUtils {
         }
         return sb.toString();
     }
+
+	public String getMaxVallue() {
+		return ""+ maxVal;
+	}
 }

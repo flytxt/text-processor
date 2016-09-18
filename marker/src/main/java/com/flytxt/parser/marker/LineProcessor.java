@@ -14,4 +14,5 @@ public interface LineProcessor {
 
     String getFilter();
 
+    int getMaxListSize();
 }
